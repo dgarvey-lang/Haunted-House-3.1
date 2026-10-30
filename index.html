@@ -1,0 +1,1567 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Haunted House: 3-1 Systems of Equations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Creepster&family=JetBrains+Mono:wght@500;700&family=STIX+Two+Text:wght@500&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+h3{font-family:var(--f-display); font-weight:700; font-size:1.08rem; margin:0}
+h4{margin:0 0 4px; font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--help)}
+p{margin:0}
+.who{font-size:.92rem; color:var(--muted)}
+.who b{color:var(--ink)}
+.sheet{background:var(--sheet); border:1px solid var(--rule-strong); border-radius:6px; padding:24px clamp(16px, 4vw, 34px); display:flex; flex-direction:column; gap:16px; box-shadow:0 1px 0 var(--rule), 0 10px 30px -18px rgba(20,40,40,.35)}
+.stack{display:flex; flex-direction:column; gap:12px}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+.btn{font:inherit; font-size:.95rem; font-weight:700; color:var(--ink); background:var(--sheet); border:2px solid var(--rule-strong); border-radius:6px; padding:8px 16px; cursor:pointer; min-height:42px}
+.btn:hover:not(:disabled){border-color:var(--accent)}
+.btn:focus-visible,.fld:focus-visible,a:focus-visible,canvas:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.btn:disabled{opacity:.45; cursor:default}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.btn.help{border-color:var(--help); color:var(--help)}
+.btn.armed{border-color:var(--bad); color:var(--bad)}
+.actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.fld{font:inherit; color:var(--ink); background:var(--sheet); border:2px solid var(--rule-strong); border-radius:6px; padding:5px 9px; max-width:100%}
+input.num{width:7.5ch; text-align:center; font-family:var(--f-mono); font-size:.95rem}
+.fld.ok{border-color:var(--ok); background:var(--ok-soft)}
+.fld.bad{border-color:var(--bad); background:var(--bad-soft)}
+.fld.missing{border-style:dashed; border-color:var(--help)}
+label.inline{display:flex; flex-wrap:wrap; align-items:center; gap:8px}
+
+/* progress strip */
+.strip{display:grid; grid-template-columns:repeat(13, minmax(0,1fr)); gap:4px}
+.cell{height:30px; border-radius:4px; border:1px solid var(--rule-strong); background:var(--sheet); display:flex; align-items:center; justify-content:center; font-family:var(--f-mono); font-size:.78rem; color:var(--muted); font-variant-numeric:tabular-nums}
+.cell.own{background:var(--ok-soft); border-color:var(--ok); color:var(--ok)}
+.cell.helped{background:var(--help-soft); border-color:var(--help); color:var(--help)}
+.cell.cur{border:2px solid var(--accent); color:var(--accent); font-weight:700}
+.legend{display:flex; flex-wrap:wrap; gap:4px 16px; font-size:.82rem; color:var(--muted)}
+.legend i{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:5px; vertical-align:-1px; border:1px solid}
+.legend .l-own{background:var(--ok-soft); border-color:var(--ok)}
+.legend .l-help{background:var(--help-soft); border-color:var(--help)}
+
+/* problem */
+.qhead{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 14px}
+.qnum{font-family:var(--f-display); font-weight:800; font-size:1.6rem; color:var(--accent)}
+.tag{font-size:.78rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:3px 9px; border-radius:20px; background:var(--help-soft); color:var(--help)}
+.directions{font-weight:700}
+.sys{font-family:var(--f-math); font-size:1.45rem; line-height:1.45; border-left:3px solid var(--ink); border-radius:10px 0 0 10px; padding:2px 0 2px 14px; align-self:flex-start}
+.mathy{font-family:var(--f-math); font-size:1.15rem; white-space:nowrap}
+fieldset.pt{border:1px solid var(--rule-strong); border-radius:6px; padding:10px 14px 14px; margin:0; display:flex; flex-direction:column; gap:10px; min-width:0}
+fieldset.pt legend{font-weight:700; padding:0 6px}
+.work{display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px}
+.work .mathy{min-width:9.5ch}
+.plotwrap{display:flex; flex-direction:column; gap:8px; max-width:440px}
+.plotbar{display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px; font-size:.85rem; color:var(--muted)}
+.plotbar .dot{display:inline-block; width:11px; height:11px; border-radius:50%; margin:0 5px 0 0; vertical-align:-1px}
+.plotbar .coord{font-family:var(--f-mono); color:var(--ink); font-weight:700}
+canvas.plot{width:100%; max-width:440px; aspect-ratio:1/1; display:block; border:2px solid var(--rule-strong); border-radius:6px; background:var(--plot-bg); cursor:crosshair; touch-action:manipulation}
+canvas.plot.small{max-width:320px; cursor:default}
+canvas.plot.ok{border-color:var(--ok)}
+canvas.plot.bad{border-color:var(--bad)}
+canvas.plot.missing{border-style:dashed; border-color:var(--help)}
+.step{font-weight:700; margin-top:4px}
+.desmos{display:inline-flex; align-items:center; gap:6px; font-weight:700; color:var(--accent)}
+.msg{min-height:1.5em; font-weight:700}
+.msg.good{color:var(--ok)} .msg.warn{color:var(--bad)} .msg.info{color:var(--help)}
+.helpbox{border:1px solid var(--help); background:var(--help-soft); border-radius:6px; padding:14px 18px; display:flex; flex-direction:column; gap:14px}
+.helpbox ol{margin:4px 0 0; padding-left:1.3em}
+.helpbox li{margin:3px 0}
+.helpbox p + p{margin-top:6px}
+.warnnote{font-size:.88rem; color:var(--help)}
+
+/* finish + teacher */
+.code{font-family:var(--f-mono); font-weight:700; font-size:clamp(1rem, 3.6vw, 1.35rem); letter-spacing:.04em; background:var(--accent-soft); color:var(--ink); border:2px dashed var(--accent); border-radius:6px; padding:14px 16px; word-break:break-all; user-select:all}
+.stats{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:10px}
+.stat{border:1px solid var(--rule-strong); border-radius:6px; padding:10px 14px}
+.stat b{display:block; font-family:var(--f-display); font-size:1.6rem; line-height:1.1; font-variant-numeric:tabular-nums}
+.stat span{font-size:.85rem; color:var(--muted)}
+.tablewrap{overflow-x:auto; min-width:0}
+table.rt{border-collapse:collapse; width:100%; font-size:.92rem; font-variant-numeric:tabular-nums}
+.rt th,.rt td{padding:7px 10px; border-bottom:1px solid var(--rule); text-align:left; vertical-align:top}
+.rt th{font-size:.75rem; letter-spacing:.07em; text-transform:uppercase; color:var(--muted)}
+.pill{display:inline-block; padding:1px 9px; border-radius:20px; font-size:.82rem; font-weight:700; white-space:nowrap}
+.pill.own{background:var(--ok-soft); color:var(--ok)}
+.pill.rec{background:var(--accent-soft); color:var(--accent)}
+.pill.need{background:var(--bad-soft); color:var(--bad)}
+.pill.invalid{background:var(--bad-soft); color:var(--bad)}
+textarea.fld{width:100%; font-family:var(--f-mono); font-size:.88rem}
+.grid2{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:12px}
+.grid2 label{display:flex; flex-direction:column; gap:4px; font-weight:700; font-size:.92rem}
+details summary{cursor:pointer; font-weight:700}
+.report{border-top:1px solid var(--rule-strong); padding-top:14px; display:flex; flex-direction:column; gap:12px}
+.foot{font-size:.85rem; color:var(--muted); text-align:center}
+.foot a{color:var(--accent)}
+.rules{margin:0; padding-left:1.2em; display:flex; flex-direction:column; gap:6px}
+@media (max-width:520px){ body{font-size:16px} .cell{height:26px; font-size:.7rem} .sys{font-size:1.25rem} }
+/* ===== Haunted house layer ===== */
+:root{
+  --f-display:"Creepster","Chiller","Impact",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-math:"STIX Two Text","Times New Roman",Georgia,serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --night:#0d0820; --text:#f3ecff; --text-dim:#c3b6e2; --pumpkin:#ff8a1f; --slime:#8bf05a; --glow:rgba(255,138,31,.6);
+  --sheet:#fbf3df; --ink:#2b1b14; --muted:#6a5846; --rule:#decfa9; --rule-strong:#b6a275;
+  --accent:#5b2a9e; --accent-ink:#ffffff; --accent-soft:#ece0fb;
+  --ok:#1d6b3e; --ok-soft:#dff1e4; --bad:#a3261e; --bad-soft:#fbe4e1; --help:#8a5200; --help-soft:#fbeccb;
+  --line1:#1f63c6; --line2:#cc3b2b; --plot-bg:#fffdf6; --plot-grid:#e6dcc0; --axis:#6c6250;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --sheet:#1d1530; --ink:#efe8ff; --muted:#b3a5d0; --rule:#33264f; --rule-strong:#54447d;
+    --accent:#c4a8ff; --accent-ink:#1b0f33; --accent-soft:#2c2150;
+    --ok:#7ee0a3; --ok-soft:#173424; --bad:#ff9a8f; --bad-soft:#40201f; --help:#f5c06b; --help-soft:#3a2a10;
+    --line1:#74adff; --line2:#ff8a78; --plot-bg:#150e26; --plot-grid:#2b2145; --axis:#9a8fba;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --sheet:#1d1530; --ink:#efe8ff; --muted:#b3a5d0; --rule:#33264f; --rule-strong:#54447d;
+  --accent:#c4a8ff; --accent-ink:#1b0f33; --accent-soft:#2c2150;
+  --ok:#7ee0a3; --ok-soft:#173424; --bad:#ff9a8f; --bad-soft:#40201f; --help:#f5c06b; --help-soft:#3a2a10;
+  --line1:#74adff; --line2:#ff8a78; --plot-bg:#150e26; --plot-grid:#2b2145; --axis:#9a8fba;
+  color-scheme:dark;
+}
+body{
+  margin:0; color:var(--text); background-color:var(--night); min-height:100vh;
+  background-image:radial-gradient(900px 500px at 88% -8%, rgba(246,236,182,.16), transparent 62%), radial-gradient(700px 420px at 8% 108%, rgba(255,138,31,.12), transparent 60%), linear-gradient(#0d0820 0%, #190d30 55%, #2a1238 100%);
+  font-family:var(--f-body); font-size:17px; line-height:1.55;
+}
+.wrap{max-width:1040px; margin:0 auto; padding-block:20px 56px; padding-left:max(14px, env(safe-area-inset-left, 0px)); padding-right:max(14px, env(safe-area-inset-right, 0px)); display:flex; flex-direction:column; gap:16px}
+header.top{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:10px 16px}
+.eyebrow{font-size:.78rem; letter-spacing:.1em; text-transform:uppercase; color:var(--text-dim); font-weight:700}
+h1{font-family:var(--f-display); font-weight:400; letter-spacing:.03em; font-size:clamp(2.1rem, 7.5vw, 3.5rem); line-height:1; margin:4px 0 0; color:var(--pumpkin); text-shadow:0 0 18px rgba(255,138,31,.55), 0 3px 0 #3a1500; text-wrap:balance}
+h2{font-family:var(--f-display); font-weight:400; letter-spacing:.03em; font-size:1.9rem; line-height:1.1; margin:0; text-wrap:balance}
+h3{font-family:var(--f-body); font-weight:700; font-size:1.1rem; margin:0}
+.sheet h2{color:var(--accent)}
+.sheet{color:var(--ink)}
+.tools{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.who{color:var(--text-dim); font-size:.92rem}
+.who b{color:var(--text)}
+.tbtn{font:inherit; font-size:.85rem; font-weight:700; color:var(--text); background:rgba(255,255,255,.08); border:1.5px solid rgba(255,255,255,.28); border-radius:20px; padding:5px 12px; cursor:pointer; min-height:36px}
+.tbtn:hover{border-color:var(--pumpkin)}
+.tbtn:focus-visible{outline:3px solid var(--pumpkin); outline-offset:2px}
+.foot{color:var(--text-dim)}
+.foot a{color:var(--pumpkin)}
+
+/* page fade used when a door opens */
+#fade{position:fixed; inset:0; background:#000; opacity:0; pointer-events:none; transition:opacity .35s; z-index:60}
+#fade.on{opacity:1; pointer-events:auto}
+
+/* ---- the house ---- */
+.hub{display:grid; gap:18px; grid-template-columns:minmax(0,1fr)}
+@media (min-width:900px){ .hub{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); align-items:start} }
+.house{container-type:inline-size; position:relative; width:100%; max-width:740px; margin:0 auto}
+.sky{position:absolute; left:0; right:0; top:-5cqw; height:14cqw; pointer-events:none; overflow:hidden; z-index:3}
+.bat{position:absolute; left:0; top:0; font-size:18px; font-size:5cqw; line-height:1; animation:fly 15s linear infinite}
+.bat.b2{top:4cqw; font-size:4cqw; animation-duration:19s; animation-delay:-7s}
+.bat.b3{top:1.5cqw; font-size:3.4cqw; animation-duration:23s; animation-delay:-13s}
+@keyframes fly{from{transform:translate(-8cqw,0)} 25%{transform:translate(22cqw,2cqw)} 50%{transform:translate(52cqw,-1cqw)} 75%{transform:translate(82cqw,2cqw)} to{transform:translate(110cqw,0)}}
+.roof{display:block; width:100%; height:auto}
+.floors{position:relative; border:4px solid #0b0716; border-top:0; overflow:hidden; background:#1a1029; box-shadow:0 18px 40px -18px rgba(0,0,0,.9)}
+.floor{position:relative; aspect-ratio:100/27; border-bottom:3px solid #0b0716;
+  background:radial-gradient(ellipse at 50% 0%, rgba(255,138,31,.10), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 2px, transparent 2px 16px), linear-gradient(#2d1b46,#1f1333)}
+.floor:nth-of-type(3){border-bottom:0}
+.floor::after{content:""; position:absolute; left:0; right:0; bottom:0; height:7%; background:linear-gradient(#4a2c18,#2f1b0e)}
+.flabel{position:absolute; top:2%; left:50%; transform:translateX(-50%); font-size:9px; font-size:2.3cqw; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.28); font-weight:700; pointer-events:none; white-space:nowrap}
+.web{position:absolute; top:0; width:9%; aspect-ratio:1; fill:none; stroke:rgba(255,255,255,.3); stroke-width:1; pointer-events:none}
+.web.tl{left:0}
+.web.tr{right:0; transform:scaleX(-1)}
+.ghostf{position:absolute; top:12%; left:0; font-size:18px; font-size:5.4cqw; line-height:1; opacity:.32; pointer-events:none; animation:drift 26s linear infinite; z-index:1}
+.ghostf.g2{animation-duration:34s; animation-delay:-14s; top:22%}
+@keyframes drift{from{transform:translateX(-8cqw)} to{transform:translateX(105cqw)}}
+.front{position:absolute; left:6%; bottom:7%; width:9.5%; height:74%; transform:translateX(-50%); border-radius:45% 45% 2px 2px / 18% 18% 0 0; background:linear-gradient(#3b2459,#241540); border:2px solid #0b0716; box-shadow:0 0 14px rgba(139,240,90,.25)}
+.front::after{content:""; position:absolute; right:14%; top:52%; width:12%; aspect-ratio:1; border-radius:50%; background:#8bf05a; box-shadow:0 0 6px #8bf05a}
+.stair{position:absolute; bottom:7%; width:9%; height:66%; transform:translateX(-50%); z-index:1}
+.stair svg{display:block; width:100%; height:100%}
+.stair.mirror svg{transform:scaleX(-1)}
+.stair i{position:absolute; top:-8%; left:0; right:0; text-align:center; font-style:normal; color:var(--pumpkin); font-size:11px; font-size:3.2cqw; text-shadow:0 0 6px var(--glow)}
+
+.door{position:absolute; bottom:7%; height:72%; aspect-ratio:3/5; transform:translateX(-50%); padding:0; border:0; background:none; cursor:pointer; z-index:2; perspective:260px; font:inherit; color:inherit}
+.door:focus-visible{outline:3px solid #fff; outline-offset:3px; border-radius:6px}
+.door .inside{position:absolute; inset:0; border-radius:42% 42% 2px 2px / 20% 20% 0 0; background:#05030b; box-shadow:inset 0 0 12px #000; display:flex; align-items:center; justify-content:center; font-size:14px; font-size:4.2cqw; line-height:1}
+.door .leaf{position:absolute; inset:0; border-radius:42% 42% 2px 2px / 20% 20% 0 0; border:2px solid #20110a; transform-origin:left center; transition:transform .5s;
+  background:repeating-linear-gradient(90deg, rgba(0,0,0,.2) 0 1px, transparent 1px 7px), linear-gradient(#7a4524,#4b2813); display:flex; justify-content:center; padding-top:16%}
+.door .leaf::after{content:""; position:absolute; right:14%; top:54%; width:12%; aspect-ratio:1; border-radius:50%; background:#ffd34d; box-shadow:0 0 6px #ffb347}
+.plate{font-family:var(--f-display); font-size:12px; font-size:3.7cqw; line-height:1.25; height:fit-content; padding:0 .4em; border-radius:3px; background:#d9b45a; color:#2a1a08}
+.door:hover .leaf,.door.near .leaf{box-shadow:0 0 0 2px var(--pumpkin), 0 0 16px 3px rgba(255,138,31,.8)}
+.door.done .leaf{transform:rotateY(-78deg)}
+.door.done .inside{background:radial-gradient(circle at 50% 62%, rgba(139,240,90,.85), rgba(60,160,60,.3) 42%, #05030b 78%)}
+.door.done.help .inside{background:radial-gradient(circle at 50% 62%, rgba(255,211,77,.95), rgba(255,138,31,.35) 42%, #05030b 78%)}
+.door.done:hover .leaf,.door.done.near .leaf{box-shadow:none}
+
+.player{position:absolute; z-index:4; transform:translate(-50%,-100%); transition:top .45s ease-in-out; pointer-events:none; font-size:36px; font-size:11.5cqw; line-height:1}
+.player .bob{display:block}
+.player.walking .bob{animation:bob .28s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-7%)}}
+.sprite{display:block; transition:transform .12s; filter:drop-shadow(0 2px 3px rgba(0,0,0,.7))}
+.lawn{display:flex; justify-content:space-between; align-items:flex-end; padding:0 3%; font-size:20px; font-size:5.4cqw; line-height:1; height:7cqw; background:linear-gradient(#0f1d12,#08100a); border-radius:0 0 12px 12px; overflow:hidden}
+.hint{margin:12px auto 0; max-width:740px; text-align:center; color:var(--text-dim); min-height:3.1em}
+.pad{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:740px; margin:6px auto 0}
+.pbtn{font:inherit; font-size:1.2rem; min-width:54px; height:48px; border-radius:12px; border:2px solid #5b3f94; background:#2a1b4a; color:#fff; cursor:pointer; touch-action:none; user-select:none; -webkit-user-select:none; padding:0 12px}
+.pbtn:hover:not(:disabled){border-color:var(--pumpkin)}
+.pbtn:focus-visible{outline:3px solid var(--pumpkin); outline-offset:2px}
+.pbtn.on{background:#43297a}
+.pbtn:disabled{opacity:.35; cursor:default}
+.pbtn.main{background:var(--pumpkin); color:#1b0f33; border-color:#ffb066; font-weight:700; font-size:1rem; padding:0 18px}
+.toast{min-height:1.6em; text-align:center; color:var(--pumpkin); font-weight:700; margin:6px 0 0}
+
+.card{background:rgba(20,12,40,.74); border:1.5px solid rgba(255,255,255,.16); border-radius:12px; padding:16px; box-shadow:0 18px 40px -22px #000; display:flex; flex-direction:column; gap:10px}
+.card h2{color:var(--pumpkin)}
+.count{font-size:1.05rem; color:var(--text-dim); margin:0}
+.count b{font-family:var(--f-display); font-size:2.2rem; line-height:1; color:var(--text); font-weight:400}
+.legend2{display:flex; flex-wrap:wrap; gap:4px 16px; font-size:.84rem; color:var(--text-dim)}
+.legend2 i{display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-1px; border:2px solid}
+.legend2 .a{border-color:#8bf05a}
+.legend2 .b{border-color:#ffb347; border-style:dashed}
+.pz{display:block; width:100%; height:auto; border-radius:10px; background:#0b0716}
+.pz .slot{fill:#150d2b; stroke:#4a3a78; stroke-width:2; stroke-dasharray:5 5}
+.pz .qm{fill:#6f5aa8; font-family:var(--f-display); font-size:46px; text-anchor:middle}
+.pz .qn{fill:#8b78c4; font-family:var(--f-body); font-weight:700; font-size:15px}
+.pz .edge{fill:none; stroke-width:3}
+.pz .edge.st1{stroke:#8bf05a}
+.pz .edge.st2{stroke:#ffb347; stroke-dasharray:7 4}
+.pop{transform-box:fill-box; transform-origin:center; animation:pop .85s ease-out}
+@keyframes pop{0%{transform:scale(.35); opacity:0; filter:brightness(2.4)} 60%{transform:scale(1.12); opacity:1} 100%{transform:scale(1); filter:none}}
+
+/* ---- inside a room ---- */
+.roomwrap{background:radial-gradient(ellipse at 50% -10%, #4b2a78 0%, #1a0f30 62%); border:3px solid #0b0716; border-radius:14px; padding:14px; box-shadow:0 0 0 2px #3a2760, 0 20px 50px -20px #000, inset 0 0 60px rgba(0,0,0,.6); display:flex; flex-direction:column; gap:12px}
+.roomhead{display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:6px 14px}
+.rmname{font-family:var(--f-display); font-size:clamp(1.6rem, 5vw, 2.3rem); line-height:1.05; color:var(--pumpkin); text-shadow:0 0 14px rgba(255,138,31,.45)}
+.rmline{font-style:italic; color:var(--text-dim)}
+.chip{font-weight:700; padding:5px 14px; border-radius:20px; background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.25); color:var(--text); white-space:nowrap}
+.flick{animation:flick 3.2s ease-in-out infinite}
+@keyframes flick{0%,100%{opacity:1} 45%{opacity:.72} 60%{opacity:.96}}
+.pieceget{display:flex; gap:14px; align-items:center; padding:12px 14px; border:2px solid var(--ok); background:var(--ok-soft); color:var(--ink); border-radius:8px; animation:rise .6s ease-out}
+.pieceget.st2{border-color:var(--help); background:var(--help-soft)}
+.pieceget b{display:block; font-family:var(--f-display); font-weight:400; font-size:1.5rem; letter-spacing:.03em}
+.pieceicon{display:block; width:104px; height:auto; flex:none; border-radius:8px; border:2px solid currentColor; color:var(--ok)}
+.pieceget.st2 .pieceicon{color:var(--help)}
+@keyframes rise{from{transform:translateY(10px) scale(.96); opacity:0} to{transform:none; opacity:1}}
+.cert{border:3px double var(--rule-strong); gap:14px; text-align:left}
+.certtop{font-size:1.8rem; letter-spacing:.3em}
+#doneBoard{max-width:560px}
+
+@media (max-width:520px){ body{font-size:16px} .roomwrap{padding:8px} .pieceicon{width:80px} }
+@media (prefers-reduced-motion: no-preference){ .btn{transition:border-color .15s} }
+@media (prefers-reduced-motion: reduce){
+  .bat,.ghostf,.flick,.pop,.player.walking .bob,.pieceget{animation:none!important}
+  .player,#fade,.door .leaf{transition:none!important}
+}
+
+</style></head>
+<body>
+<svg id="defsvg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+  <linearGradient id="skyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f0a26"/><stop offset=".55" stop-color="#3a1458"/><stop offset="1" stop-color="#b8461a"/></linearGradient>
+  <radialGradient id="moong"><stop offset="0" stop-color="#fff3b0" stop-opacity=".6"/><stop offset="1" stop-color="#fff3b0" stop-opacity="0"/></radialGradient>
+  <radialGradient id="warm"><stop offset="0" stop-color="#ffd34d" stop-opacity=".9"/><stop offset="1" stop-color="#ff8a1f" stop-opacity="0"/></radialGradient>
+
+  <symbol id="web" viewBox="0 0 40 40"><path d="M0 0H40M0 0L34 14M0 0L24 28M0 0L10 38M0 0V40M10 0Q8 8 0 10M20 0Q14 14 0 20M30 0Q20 20 0 30"/></symbol>
+  <symbol id="stairup" viewBox="0 0 40 50"><path d="M0 50V42H8V34H16V26H24V18H32V10H40V50Z" fill="#3a2616" stroke="#150b05" stroke-width="1.5"/><path d="M0 36L40 4" stroke="#a07a45" stroke-width="2" fill="none"/></symbol>
+  <symbol id="stairdn" viewBox="0 0 40 50"><rect x="2" y="16" width="36" height="34" fill="#05030b"/><path d="M2 14H38M6 14V32M20 14V32M34 14V32" stroke="#a07a45" stroke-width="2" fill="none"/></symbol>
+
+  <g id="bat"><path d="M-14 0Q-7 -9 0 -2Q7 -9 14 0Q7 -3 0 5Q-7 -3 -14 0Z"/></g>
+  <g id="jack">
+    <ellipse rx="42" ry="34" fill="#f57c14"/><ellipse rx="26" ry="34" fill="#ff9a2e"/>
+    <path d="M-14 -33Q-27 0 -14 33M14 -33Q27 0 14 33" stroke="#c2570a" stroke-width="3" fill="none"/>
+    <rect x="-4" y="-46" width="9" height="14" rx="2" fill="#3b5a1d"/>
+    <g fill="#ffe27a"><path d="M-27 -6L-15 -22L-5 -6Z"/><path d="M5 -6L15 -22L27 -6Z"/><path d="M-5 6L0 -4L5 6Z"/><path d="M-27 12L-18 22L-9 13L0 23L9 13L18 22L27 12L21 27L-21 27Z"/></g>
+  </g>
+
+  <!-- the lost picture: 520 x 330 -->
+  <g id="scene">
+    <rect width="520" height="330" fill="url(#skyg)"/>
+    <g fill="#fff" opacity=".8"><circle cx="30" cy="28" r="1.5"/><circle cx="85" cy="55" r="1.1"/><circle cx="140" cy="22" r="1.6"/><circle cx="205" cy="48" r="1.2"/><circle cx="262" cy="20" r="1.5"/><circle cx="318" cy="52" r="1"/><circle cx="480" cy="170" r="1.2"/><circle cx="25" cy="110" r="1.3"/><circle cx="500" cy="30" r="1.2"/></g>
+    <circle cx="410" cy="82" r="100" fill="url(#moong)"/>
+    <circle cx="410" cy="82" r="46" fill="#f6ecb6"/>
+    <g fill="#e0d391"><circle cx="395" cy="68" r="9"/><circle cx="425" cy="95" r="12"/><circle cx="428" cy="62" r="5"/></g>
+    <g fill="#0a0614"><use href="#bat" transform="translate(360 60) scale(1.1)"/><use href="#bat" transform="translate(445 38) scale(.8)"/><use href="#bat" transform="translate(325 112) scale(.7)"/></g>
+    <path d="M0 255Q120 228 250 248T520 240V330H0Z" fill="#0a0614"/>
+    <g stroke="#0a0614" fill="none" stroke-linecap="round"><path d="M72 262C74 230 66 200 74 165" stroke-width="11"/><path d="M73 185C55 175 44 160 38 138" stroke-width="6"/><path d="M74 175C95 168 104 152 112 130" stroke-width="6"/><path d="M72 205C52 202 38 192 24 186" stroke-width="5"/><path d="M74 200C92 198 106 190 118 192" stroke-width="5"/><path d="M70 165C64 148 66 132 58 116" stroke-width="5"/><path d="M38 138C30 130 26 120 20 112M112 130C116 120 124 114 128 104" stroke-width="3"/></g>
+    <g fill="#0c0718"><rect x="150" y="130" width="46" height="130"/><polygon points="142,130 173,76 204,130"/><rect x="290" y="104" width="16" height="40"/><rect x="196" y="160" width="124" height="100"/><polygon points="186,160 258,106 330,160"/><rect x="320" y="185" width="68" height="75"/><polygon points="312,185 354,152 396,185"/></g>
+    <g fill="#ffcf4a"><rect x="165" y="150" width="16" height="24" rx="8"/><rect x="165" y="196" width="16" height="24" rx="2"/><rect x="212" y="180" width="20" height="28" rx="2"/><rect x="284" y="180" width="20" height="28" rx="2"/><circle cx="258" cy="140" r="9"/><rect x="345" y="203" width="16" height="24" rx="2"/></g>
+    <path d="M173 150V174M165 162H181M173 196V220M165 208H181M222 180V208M212 194H232M294 180V208M284 194H304M258 131V149M249 140H267M353 203V227M345 215H361" stroke="#0c0718" stroke-width="2" fill="none"/>
+    <path d="M246 260V232A12 12 0 0 1 270 232V260Z" fill="#3a1d10"/>
+    <circle cx="241" cy="228" r="14" fill="url(#warm)"/><circle cx="241" cy="228" r="3" fill="#ffd34d"/>
+    <g fill="#0a0614"><rect x="408" y="246" width="112" height="5"/><rect x="408" y="262" width="112" height="5"/><path d="M414 272V240l5-8 5 8V272Z"/><path d="M432 272V240l5-8 5 8V272Z"/><path d="M450 272V240l5-8 5 8V272Z"/><path d="M468 272V240l5-8 5 8V272Z"/><path d="M486 272V240l5-8 5 8V272Z"/><path d="M504 272V240l5-8 5 8V272Z"/></g>
+    <g transform="translate(455 172)"><path d="M-15 22V-4A15 15 0 0 1 15 -4V22L10 17L5 22L0 17L-5 22L-10 17Z" fill="#e8e4ff" opacity=".88"/><circle cx="-5" cy="-3" r="2.4" fill="#120a2a"/><circle cx="5" cy="-3" r="2.4" fill="#120a2a"/><ellipse cx="0" cy="5" rx="3" ry="4" fill="#120a2a"/></g>
+    <path d="M26 0V40" stroke="#bbb" stroke-width="1"/><circle cx="26" cy="44" r="5" fill="#0a0614"/>
+    <path d="M0 292Q130 276 260 290T520 284V330H0Z" fill="#060310"/>
+    <g fill="#1b1334"><path d="M22 314V288a13 13 0 0 1 26 0V314Z"/><path d="M104 320V298a11 11 0 0 1 22 0V320Z"/></g>
+    <path d="M35 294v14M29 299h12M115 302v12M109 306h12" stroke="#3a2d62" stroke-width="2" fill="none"/>
+    <circle cx="262" cy="290" r="76" fill="url(#warm)" opacity=".5"/>
+    <use href="#jack" transform="translate(262 290)"/>
+    <use href="#jack" transform="translate(182 306) scale(.55)"/>
+    <use href="#jack" transform="translate(352 308) scale(.5)"/>
+  </g>
+  <g id="clips"></g>
+</defs>
+</svg>
+<div id="fade"></div>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Intermediate Algebra · 3-1 Practice</div>
+      <h1>The Haunted House of Systems</h1>
+    </div>
+    <div class="tools">
+      <span class="who" id="who" hidden></span>
+      <button type="button" class="tbtn" id="musicBtn" aria-pressed="true">🎵 Music on</button>
+      <button type="button" class="tbtn" id="sfxBtn" aria-pressed="true">🔔 Effects on</button>
+    </div>
+  </header>
+
+  <!-- start -->
+  <section class="sheet" id="vStart" hidden>
+    <h2>Enter if you dare…</h2>
+    <p>A ghost has scattered the 13 pieces of a picture all around this haunted house. Solve the problem behind each door to win its puzzle piece back.</p>
+    <ul class="rules">
+      <li>Walk around the house and pick <b>any door</b>. Door numbers match the problem numbers on the paper worksheet. Show your work in the boxes, then press <b>Check answer</b>.</li>
+      <li>Get it right and the door gives you a <b>puzzle piece</b> 🧩.</li>
+      <li>Stuck? Press <b>Help</b>. The first press gives a hint, the next gives more help, and then the full solution. If you use <b>More help</b> or the full solution, the ghosts make you solve a similar problem on your own before the door gives up its piece.</li>
+      <li>Find all 13 pieces to finish the picture. Then copy your <b>teacher code</b> and turn it in with your name, spelled the same way you type it here.</li>
+      <li>🔊 The house has spooky music and sound effects. Use the buttons at the top of the page to turn them off.</li>
+    </ul>
+    <label class="grid2" style="grid-template-columns:1fr"><span style="display:flex;flex-direction:column;gap:4px;font-weight:700">Your first and last name
+      <input class="fld" id="nameIn" type="text" maxlength="40" autocomplete="name" placeholder="First Last" style="max-width:360px"></span></label>
+    <div class="actions"><button class="btn primary" id="startBtn">Open the front door 🚪</button><span class="msg warn" id="startMsg" role="status"></span></div>
+  </section>
+
+  <!-- hallway / house -->
+  <section id="vHouse" hidden>
+    <div class="hub">
+      <div class="housecol">
+        <div class="house" id="house">
+          <div class="sky" aria-hidden="true"><span class="bat b1">🦇</span><span class="bat b2">🦇</span><span class="bat b3">🦇</span></div>
+          <svg class="roof" viewBox="0 0 100 20" aria-hidden="true">
+            <polygon points="0,20 50,1.5 100,20" fill="#241636" stroke="#0b0716" stroke-width=".6"/>
+            <rect x="70" y="3" width="8" height="11" fill="#1a0f28" stroke="#0b0716" stroke-width=".5"/>
+            <circle cx="50" cy="12.5" r="3.2" fill="#ffcf4a"/><path d="M50 9.3V15.7M46.8 12.5H53.2" stroke="#241636" stroke-width=".7"/>
+            <path d="M8 20 L50 4.6 L92 20" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="1.4"/>
+          </svg>
+          <div class="floors" id="floors"></div>
+          <div class="lawn" aria-hidden="true"><span>🎃</span><span>⚰️</span><span>🕯️</span><span>🎃</span><span>💀</span><span>🕸️</span><span>🎃</span></div>
+        </div>
+        <p class="hint" id="hint" role="status"></p>
+        <div class="pad" id="pad">
+          <button type="button" class="pbtn" id="leftBtn" aria-label="Walk left">◀</button>
+          <button type="button" class="pbtn" id="rightBtn" aria-label="Walk right">▶</button>
+          <button type="button" class="pbtn" id="upBtn" aria-label="Go up the stairs" disabled>▲ Up</button>
+          <button type="button" class="pbtn" id="downBtn" aria-label="Go down the stairs" disabled>▼ Down</button>
+          <button type="button" class="pbtn main" id="openBtn" disabled>🚪 Open door</button>
+        </div>
+        <p class="toast" id="toast" role="status"></p>
+      </div>
+      <aside class="card" aria-label="Puzzle progress">
+        <h2>The Lost Picture</h2>
+        <p class="count"><b id="cnt">0</b> / 13 pieces found</p>
+        <div id="board"></div>
+        <div class="legend2"><span><i class="a"></i>Earned on your own</span><span><i class="b"></i>Needed extra help</span></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- room (a problem) -->
+  <section id="vRoom" hidden>
+    <div class="roomwrap">
+      <div class="roomhead">
+        <div>
+          <div class="eyebrow" id="rmEyebrow"></div>
+          <div class="rmname"><span class="flick" aria-hidden="true">🕯️</span> <span id="rmName"></span></div>
+          <p class="rmline" id="rmLine"></p>
+        </div>
+        <span class="chip" id="rmChip"></span>
+      </div>
+      <article class="sheet" id="qSheet">
+        <div class="qhead"><span class="qnum" id="qNum"></span><span class="tag" id="qTag" hidden></span></div>
+        <p class="directions" id="qDir"></p>
+        <div class="stack" id="qBody"></div>
+        <div class="actions">
+          <button class="btn primary" id="checkBtn">Check answer</button>
+          <button class="btn help" id="helpBtn">Help</button>
+          <button class="btn primary" id="nextBtn" hidden></button>
+        </div>
+        <p class="warnnote" id="helpWarn" hidden>Heads up: using More help or the full solution means the ghosts will give you a similar problem before you can take this door’s puzzle piece.</p>
+        <p class="msg" id="qMsg" role="status"></p>
+        <div class="pieceget" id="pieceGet" hidden></div>
+        <div class="helpbox" id="helpBox" hidden></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- finished -->
+  <section class="sheet cert" id="vDone" hidden>
+    <div class="certtop" aria-hidden="true">🎃🕸️🎃</div>
+    <h2 id="doneTitle">The house is saved!</h2>
+    <p class="muted small" id="doneDate"></p>
+    <div id="doneBoard"></div>
+    <div class="stats" id="doneStats"></div>
+    <div class="stack" style="gap:8px">
+      <h3>Your teacher code</h3>
+      <p class="muted small" id="codeFor"></p>
+      <div class="code" id="codeOut"></div>
+      <div class="actions"><button class="btn primary" id="copyBtn">Copy name and code</button><span class="msg good" id="copyMsg" role="status"></span></div>
+      <textarea class="fld" id="copyFallback" rows="2" readonly hidden></textarea>
+    </div>
+    <div class="actions" style="border-top:1px solid var(--rule);padding-top:16px">
+      <button class="btn" id="restartBtn">Restart the haunt</button>
+      <span class="muted small">Restarting erases your work on this device and starts a new attempt.</span>
+    </div>
+  </section>
+
+  <section class="sheet" id="vTeacher" hidden>
+    <h2>Teacher: read student codes</h2>
+    <p class="muted small">A code only opens with the student’s name. Capital letters, spaces and punctuation in the name don’t matter, but the spelling does.</p>
+    <div class="grid2">
+      <label for="tName">Student name<input class="fld" id="tName" type="text" autocomplete="off"></label>
+      <label for="tCode">Code<input class="fld" id="tCode" type="text" autocomplete="off" spellcheck="false" style="font-family:var(--f-mono)"></label>
+    </div>
+    <div class="actions"><button class="btn primary" id="tCheck">Check code</button></div>
+    <details id="tBatchWrap">
+      <summary>Check a whole class at once</summary>
+      <div class="stack" style="margin-top:10px">
+        <p class="muted small">Paste one student per line: the name, then the code. A comma or a tab between them works, so you can paste two columns straight from a spreadsheet or Google Form responses.</p>
+        <textarea class="fld" id="tBatch" rows="6" placeholder="Jane Doe, ABCDE-FGHJK-…"></textarea>
+        <div class="actions"><button class="btn primary" id="tBatchBtn">Check all</button></div>
+      </div>
+    </details>
+    <div id="tOut" class="stack"></div>
+    <div class="actions"><button class="btn" id="tBack">Back to the worksheet</button></div>
+  </section>
+
+  <p class="foot"><a href="#teacher" id="teacherLink">Teacher: read student codes</a></p>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- settings ---------- */
+var HELP_LIMIT = 2;      // help level that counts as "too much help" (2 = More help, 3 = full solution)
+var MAX_SIMILAR = 3;     // most similar problems a student does for one door
+var STORE = 'haunt31-v1', ATTEMPTS = 'haunt31-attempts', PREFS = 'haunt31-prefs';
+var SALT = 'IA31-haunted-systems-v1';
+var ALPH = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+var REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* ---------- helpers ---------- */
+
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function fmt(n){ n = Math.round(n*1e6)/1e6; return n < 0 ? '−' + (-n) : String(n); }
+function norm(s){ return String(s).toLowerCase().replace(/[−–—]/g,'-').replace(/\s+/g,'').replace(/[()]/g,''); }
+function numOf(s){
+  s = norm(s); if(s === '') return NaN;
+  if(/^-?\d*\.?\d+$/.test(s)) return parseFloat(s);
+  var m = /^(-?\d+)\/(-?\d+)$/.exec(s); if(m && +m[2] !== 0) return (+m[1])/(+m[2]);
+  return NaN;
+}
+function near(sv, target, tol){ var v = numOf(sv); return !isNaN(v) && Math.abs(v - target) < (tol || 1e-9); }
+function pairText(p){ return '(' + fmt(p[0]) + ', ' + fmt(p[1]) + ')'; }
+function sat(p, e){ return e.a*p[0] + e.b*p[1] === e.c; }
+function term(c, v){ var a = Math.abs(c); return a === 1 ? '(' + v + ')' : a + '(' + v + ')'; }
+function expr(a, b, x, y){
+  var s = '';
+  [[a,x],[b,y]].forEach(function(p){
+    var c = p[0]; if(c === 0) return;
+    var body = term(c, fmt(p[1]));
+    if(s === '') s = (c < 0 ? '−' : '') + body; else s += (c < 0 ? ' − ' : ' + ') + body;
+  });
+  return s;
+}
+function gcd(a, b){ a = Math.abs(a); b = Math.abs(b); while(b){ var t = a % b; a = b; b = t; } return a || 1; }
+function prng(seed){ var a = seed >>> 0; return function(){ a = (a + 0x6D2B79F5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function hash(s){ var h = 0x811c9dc5; for(var i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); } return h >>> 0; }
+function lin(a, b){
+  var s = '';
+  if(a !== 0) s = a === 1 ? 'x' : a === -1 ? '−x' : fmt(a) + 'x';
+  if(b !== 0){
+    var by = Math.abs(b) === 1 ? 'y' : Math.abs(b) + 'y';
+    if(s === '') s = (b < 0 ? '−' : '') + by; else s += (b < 0 ? ' − ' : ' + ') + by;
+  }
+  return s;
+}
+function eqText(a, b, c, rev){ return rev ? fmt(c) + ' = ' + lin(a, b) : lin(a, b) + ' = ' + fmt(c); }
+function slopeTerm(p, q){
+  if(q === 1) return p === 1 ? 'x' : p === -1 ? '−x' : p === 0 ? '' : fmt(p) + 'x';
+  return (p < 0 ? '−' : '') + '(' + Math.abs(p) + '/' + q + ')x';
+}
+function slopeInt(p, q, b){
+  var st = slopeTerm(p, q), s = 'y = ';
+  if(!st) return s + fmt(b);
+  s += st; if(b > 0) s += ' + ' + b; else if(b < 0) s += ' − ' + (-b);
+  return s;
+}
+function fracStr(p, q){ return q === 1 ? fmt(p) : (p < 0 ? '−' : '') + Math.abs(p) + '/' + q; }
+function rhsText(ax, c){
+  var s = ''; if(ax !== 0) s = ax === 1 ? 'x' : ax === -1 ? '−x' : fmt(ax) + 'x';
+  if(c !== 0 || s === '') s = (s === '') ? fmt(c) : s + (c > 0 ? ' + ' : ' − ') + Math.abs(c);
+  return s;
+}
+function normName(s){ return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z]/g,''); }
+function load(k){ try{ var v = localStorage.getItem(k); return v ? JSON.parse(v) : null; }catch(e){ return null; } }
+function save(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+/* ---------- the worksheet ---------- */
+function E(a, b, c, t){ return {a:a, b:b, c:c, t:t}; }
+var TYPE_NAME = {one:'One solution', none:'No solution', inf:'Infinitely many solutions'};
+var P = [
+  {n:1, kind:'two', pts:[[10,6],[3,4]], eqs:[E(1,1,16,'x + y = 16'), E(-1,1,2,'y − x = 2')]},
+  {n:2, kind:'two', pts:[[10,6],[3,4]], eqs:[E(3,-1,5,'3x − y = 5'), E(1,2,11,'x + 2y = 11')]},
+  {n:3, kind:'one', pt:[3,-2], eqs:[E(1,7,25,'x + 7y = 25'), E(5,1,11,'5x + y = 11')]},
+  {n:4, kind:'one', pt:[0,6], eqs:[E(-2,-5,-30,'−2x − 5y = −30'), E(-4,4,24,'−4x + 4y = 24')]},
+  {n:5, kind:'graph', eqs:['2y − 2x = −14','9 = 7x + y'], lines:[{m:1,b:-7},{m:-7,b:9}], type:'one', sol:[2,-5],
+   forms:['2y − 2x = −14 → add 2x to both sides: 2y = 2x − 14 → divide every term by 2: <b>y = x − 7</b>',
+          '9 = 7x + y → subtract 7x from both sides: <b>y = −7x + 9</b>'],
+   fin:'The slopes are different (1 and −7), so the lines cross once. Set the right sides equal: x − 7 = −7x + 9, so 8x = 16 and x = 2. Then y = 2 − 7 = −5.'},
+  {n:6, kind:'graph', eqs:['2 = x − y','−8x − y = −7'], lines:[{m:1,b:-2},{m:-8,b:7}], type:'one', sol:[1,-1],
+   forms:['2 = x − y → add y to both sides: y + 2 = x → subtract 2: <b>y = x − 2</b>',
+          '−8x − y = −7 → add 8x to both sides: −y = 8x − 7 → divide every term by −1: <b>y = −8x + 7</b>'],
+   fin:'The slopes are different (1 and −8), so the lines cross once. Set the right sides equal: x − 2 = −8x + 7, so 9x = 9 and x = 1. Then y = 1 − 2 = −1.'},
+  {n:7, kind:'graph', eqs:['y = 5','2x − y = 1'], lines:[{m:0,b:5},{m:2,b:-1}], type:'one', sol:[3,5],
+   forms:['y = 5 is a horizontal line: slope <b>0</b>, y-intercept <b>5</b>.',
+          '2x − y = 1 → subtract 2x from both sides: −y = −2x + 1 → divide every term by −1: <b>y = 2x − 1</b>'],
+   fin:'The slopes are different (0 and 2), so the lines cross once. Put y = 5 into y = 2x − 1: 5 = 2x − 1, so 2x = 6 and x = 3.'},
+  {n:8, kind:'graph', eqs:['y = 3x − 2','15x − 5y = 10'], lines:[{m:3,b:-2},{m:3,b:-2}], type:'inf',
+   forms:['y = 3x − 2 is already in slope-intercept form: slope <b>3</b>, y-intercept <b>−2</b>.',
+          '15x − 5y = 10 → subtract 15x from both sides: −5y = −15x + 10 → divide every term by −5: <b>y = 3x − 2</b>'],
+   fin:'Both equations are the same line, so every point on the line is a solution: infinitely many solutions.'},
+  {n:9, kind:'graph', eqs:['x − 2y = −6','y = (1/2)x − 8'], lines:[{m:0.5,b:3},{m:0.5,b:-8}], type:'none',
+   forms:['x − 2y = −6 → subtract x from both sides: −2y = −x − 6 → divide every term by −2: <b>y = (1/2)x + 3</b>',
+          'y = (1/2)x − 8 is already in slope-intercept form: slope <b>1/2</b>, y-intercept <b>−8</b>.'],
+   fin:'Same slope (1/2) but different y-intercepts (3 and −8). The lines are parallel and never meet, so there is no solution.'},
+  {n:10, kind:'graph', eqs:['3x − 5y = 20','y = 10x − 4'], lines:[{m:0.6,b:-4},{m:10,b:-4}], type:'one', sol:[0,-4],
+   forms:['3x − 5y = 20 → subtract 3x from both sides: −5y = −3x + 20 → divide every term by −5: <b>y = (3/5)x − 4</b>',
+          'y = 10x − 4 is already in slope-intercept form: slope <b>10</b>, y-intercept <b>−4</b>.'],
+   fin:'The slopes are different (3/5 and 10), so the lines cross once. Both lines have y-intercept −4, so they cross on the y-axis at (0, −4).'},
+  {n:11, kind:'desmos', eqs:['y = (1/4)x + 1','y = (5/4)x − 3'], lines:[{m:0.25,b:1},{m:1.25,b:-3}], type:'one', sol:[4,2],
+   forms:['y = (1/4)x + 1: slope <b>1/4</b>, y-intercept <b>1</b>.','y = (5/4)x − 3: slope <b>5/4</b>, y-intercept <b>−3</b>.'],
+   fin:'The slopes are different, so the lines cross once. Set the right sides equal: (1/4)x + 1 = (5/4)x − 3, so 4 = x. Then y = (1/4)(4) + 1 = 2.'},
+  {n:12, kind:'desmos', eqs:['x − 4y = −4','y = (1/4)x − 2'], lines:[{m:0.25,b:1},{m:0.25,b:-2}], type:'none',
+   forms:['x − 4y = −4 → subtract x from both sides: −4y = −x − 4 → divide every term by −4: <b>y = (1/4)x + 1</b>',
+          'y = (1/4)x − 2: slope <b>1/4</b>, y-intercept <b>−2</b>.'],
+   fin:'Same slope (1/4) but different y-intercepts (1 and −2). The lines are parallel, so there is no solution.'},
+  {n:13, kind:'desmos', eqs:['y = (1/3)x + 3','4x − 12y = −36'], lines:[{m:1/3,b:3},{m:1/3,b:3}], type:'inf',
+   forms:['y = (1/3)x + 3: slope <b>1/3</b>, y-intercept <b>3</b>.',
+          '4x − 12y = −36 → subtract 4x from both sides: −12y = −4x − 36 → divide every term by −12: <b>y = (1/3)x + 3</b>'],
+   fin:'Both equations are the same line, so there are infinitely many solutions.'}
+];
+var DIRECTIONS = {
+  two: 'Determine if the ordered pairs (10, 6) and (3, 4) are solutions to the system of linear equations. Show work to justify your answer.',
+  one: 'Determine if the ordered pair given is a solution to the system of equations. Show work to justify your answer.',
+  graph: 'Solve by graphing. Show work if an equation is not in slope-intercept form. List the answer as an ordered pair when there is one solution.',
+  desmos: 'Use Desmos to graph the system and determine the solution. If there is one solution, write your answer as an ordered pair.'
+};
+
+/* ---------- similar problems ---------- */
+function siMeta(p, q, b){ return {form:'si', text:slopeInt(p, q, b), sp:p, sq:q, sb:b}; }
+function stdMeta(p, q, b, k, rev){
+  var a = k*p, bb = -k*q, c = -k*q*b;
+  return {form:'std', text:eqText(a, bb, c, rev), a:a, b:bb, c:c, sp:p, sq:q, sb:b};
+}
+function formOf(m){
+  if(m.form === 'si') return m.text + ' is already in slope-intercept form: slope <b>' + fracStr(m.sp, m.sq) + '</b>, y-intercept <b>' + fmt(m.sb) + '</b>.';
+  var div = (m.b === 1) ? '' : ' → divide every term by ' + fmt(m.b);
+  return m.text + ' → move the x-term to the right side: ' + lin(0, m.b) + ' = ' + rhsText(-m.a, m.c) + div + ': <b>' + slopeInt(m.sp, m.sq, m.sb) + '</b>';
+}
+function okLine(p, q, b){ return q <= 10 && Math.abs(b) <= 10 && Math.abs(b + p) <= 10; }
+function finishGraph(n, metas, type, sol){
+  var m1 = metas[0], m2 = metas[1], fin;
+  if(type === 'one') fin = 'The slopes are different (' + fracStr(m1.sp, m1.sq) + ' and ' + fracStr(m2.sp, m2.sq) + '), so the lines cross once. Set the right sides equal: ' + slopeInt(m1.sp, m1.sq, m1.sb).slice(4) + ' = ' + slopeInt(m2.sp, m2.sq, m2.sb).slice(4) + '. Solving gives x = ' + fmt(sol[0]) + ', and then y = ' + fmt(sol[1]) + '.';
+  else if(type === 'none') fin = 'Same slope (' + fracStr(m1.sp, m1.sq) + ') but different y-intercepts (' + fmt(m1.sb) + ' and ' + fmt(m2.sb) + '). The lines are parallel and never meet, so there is no solution.';
+  else fin = 'Both equations simplify to ' + slopeInt(m1.sp, m1.sq, m1.sb) + ', the same line, so there are infinitely many solutions.';
+  return {n:n, kind: n >= 11 ? 'desmos' : 'graph', variant:true, eqs:metas.map(function(m){ return m.text; }),
+    lines:metas.map(function(m){ return {m:m.sp/m.sq, b:m.sb}; }), type:type, sol:sol, forms:metas.map(formOf), fin:fin};
+}
+function makeVariant(n, seed){
+  var o = P[n-1], rnd = prng(seed), t;
+  function ri(a, b){ return a + Math.floor(rnd()*(b - a + 1)); }
+  function pk(arr){ return arr[Math.floor(rnd()*arr.length)]; }
+  function nz(a, b){ var v; do{ v = ri(a, b); }while(v === 0); return v; }
+  if(o.kind === 'two' || o.kind === 'one'){
+    for(t = 0; t < 400; t++){
+      var S = [ri(-6, 8), ri(-6, 8)];
+      var eqs = [0,1].map(function(){ var a = nz(-5, 5), b = nz(-5, 5); return {a:a, b:b, c:a*S[0] + b*S[1]}; });
+      if(eqs[0].a*eqs[1].b - eqs[1].a*eqs[0].b === 0) continue;
+      if(Math.abs(eqs[0].c) > 45 || Math.abs(eqs[1].c) > 45) continue;
+      eqs.forEach(function(e){ e.t = eqText(e.a, e.b, e.c, false); });
+      var onOne = function(k){
+        var e = eqs[k], g = gcd(e.a, e.b), dx = e.b/g, dy = -e.a/g, ss = [1,-1,2,-2];
+        for(var i = 0; i < ss.length; i++){ var p = [S[0] + ss[i]*dx, S[1] + ss[i]*dy]; if(Math.abs(p[0]) <= 12 && Math.abs(p[1]) <= 12) return p; }
+        return null;
+      };
+      var offBoth = function(){ for(var u = 0; u < 60; u++){ var p = [ri(-6, 10), ri(-6, 10)]; if(!sat(p, eqs[0]) && !sat(p, eqs[1])) return p; } return null; };
+      var wrongPt = function(){ return rnd() < 0.6 ? onOne(ri(0, 1)) : offBoth(); };
+      if(o.kind === 'one'){
+        var pt = rnd() < 0.5 ? S : wrongPt(); if(!pt) continue;
+        return {n:n, kind:'one', variant:true, pt:pt, eqs:eqs};
+      }
+      var out = pk(['none','A','B']), A, B;
+      if(out === 'none'){ A = onOne(0); B = rnd() < 0.5 ? onOne(1) : offBoth(); }
+      else { var w = wrongPt(); if(out === 'A'){ A = S; B = w; } else { A = w; B = S; } }
+      if(!A || !B || (A[0] === B[0] && A[1] === B[1])) continue;
+      return {n:n, kind:'two', variant:true, pts:[A, B], eqs:eqs};
+    }
+    return null;
+  }
+  var sx, sy, m1, m2, b1, b2, p, q, b, k, p1, p2, tt, metas;
+  for(t = 0; t < 800; t++){
+    if(n === 5 || n === 6 || n === 7){
+      sx = ri(-5, 5); sy = ri(-8, 8);
+      if(n === 7){ m1 = 0; m2 = nz(-5, 5); } else { m1 = nz(-5, 5); m2 = nz(-5, 5); if(m1 === m2) continue; }
+      b1 = sy - m1*sx; b2 = sy - m2*sx;
+      if(!okLine(m1, 1, b1) || !okLine(m2, 1, b2)) continue;
+      if(n === 5) metas = [stdMeta(m1, 1, b1, pk([-2,-3]), false), stdMeta(m2, 1, b2, -1, true)];
+      else if(n === 6) metas = [stdMeta(m1, 1, b1, 1, true), stdMeta(m2, 1, b2, pk([1,2]), false)];
+      else metas = [siMeta(0, 1, b1), stdMeta(m2, 1, b2, pk([1,-1]), false)];
+      return finishGraph(n, metas, 'one', [sx, sy]);
+    }
+    if(n === 10){
+      q = pk([2,3,4,5]); p = nz(-7, 7); if(gcd(p, q) !== 1) continue;
+      b = nz(-8, 8); k = nz(-6, 6); if(k*q === p) continue;
+      if(!okLine(p, q, b) || !okLine(k, 1, b)) continue;
+      return finishGraph(n, [stdMeta(p, q, b, pk([1,-1]), false), siMeta(k, 1, b)], 'one', [0, b]);
+    }
+    if(n === 11){
+      q = pk([2,3,4]); p1 = nz(-7, 7); p2 = nz(-7, 7);
+      if(p1 === p2 || gcd(p1, q) !== 1 || gcd(p2, q) !== 1) continue;
+      tt = pk([-2,-1,1,2]); sx = q*tt; sy = ri(-6, 6); b1 = sy - p1*tt; b2 = sy - p2*tt;
+      if(!okLine(p1, q, b1) || !okLine(p2, q, b2)) continue;
+      return finishGraph(n, [siMeta(p1, q, b1), siMeta(p2, q, b2)], 'one', [sx, sy]);
+    }
+    if(n === 9 || n === 12){
+      q = n === 9 ? pk([2,3]) : pk([3,4,5]); p = nz(-5, 5); if(gcd(p, q) !== 1) continue;
+      b1 = ri(-8, 8); b2 = ri(-8, 8); if(b1 === b2) continue;
+      if(!okLine(p, q, b1) || !okLine(p, q, b2)) continue;
+      return finishGraph(n, [stdMeta(p, q, b1, 1, false), siMeta(p, q, b2)], 'none', null);
+    }
+    if(n === 8){
+      m1 = nz(-4, 4); b = nz(-8, 8); if(!okLine(m1, 1, b)) continue;
+      return finishGraph(n, [siMeta(m1, 1, b), stdMeta(m1, 1, b, pk([2,3,4,5,-2,-3]), false)], 'inf', null);
+    }
+    if(n === 13){
+      q = pk([2,3,4]); p = nz(-5, 5); if(gcd(p, q) !== 1) continue;
+      b = nz(-8, 8); if(!okLine(p, q, b)) continue;
+      return finishGraph(n, [siMeta(p, q, b), stdMeta(p, q, b, pk([2,3,4,-2,-3]), false)], 'inf', null);
+    }
+  }
+  return null;
+}
+var VCACHE = {};
+function variantFor(n, seed){ var key = n + '~' + seed; if(!VCACHE[key]) VCACHE[key] = makeVariant(n, seed); return VCACHE[key]; }
+
+
+/* ================= haunted house ================= */
+var ROOMS = [
+  {name:'The Foyer', line:'The door slams shut behind you. Better solve this one.'},
+  {name:'The Dusty Parlor', line:'A portrait’s eyes follow you across the room.'},
+  {name:'The Creaky Kitchen', line:'Something is bubbling in the cauldron.'},
+  {name:'The Cobweb Cellar', line:'Spiders skitter away from your flashlight.'},
+  {name:'The Library of Lost Souls', line:'A book whispers your name.'},
+  {name:'The Mummy’s Study', line:'Dusty bandages rustle in the corner.'},
+  {name:'The Haunted Nursery', line:'A music box plays all by itself.'},
+  {name:'The Vampire’s Bedroom', line:'The coffin lid is open just a crack…'},
+  {name:'The Witch’s Laboratory', line:'Green smoke curls up from a bubbling flask.'},
+  {name:'The Attic Window', line:'Bats flutter past the cracked glass.'},
+  {name:'The Bat Belfry', line:'The bell rings once. Nobody pulled the rope.'},
+  {name:'The Ghost Gallery', line:'Every painting has a ghost hiding in it.'},
+  {name:'The Master Crypt', line:'The last doors are close. Keep going.'}
+];
+var FLOORS = [[0,1,2,3],[4,5,6,7,8],[9,10,11,12]];   // floor 0 is the ground floor
+var STAIR = [94, 6];                                  // x position of the stairs between floor g and g+1
+var DOORS = [];
+FLOORS.forEach(function(list, g){ list.forEach(function(i, k){ DOORS[i] = {i:i, g:g, x:12 + 76*(k + 0.5)/list.length}; }); });
+var CELLS = [];
+(function(){
+  for(var i = 0; i < 13; i++){
+    var r, k, n;
+    if(i < 4){ r = 2; k = i; n = 4; } else if(i < 9){ r = 1; k = i - 4; n = 5; } else { r = 0; k = i - 9; n = 4; }
+    var w = 520/n; CELLS.push({x:k*w, y:r*110, w:w, h:110});
+  }
+})();
+
+/* ---------- state ---------- */
+var S = null, pts = [];
+function freshRec(){ return {w:0, h:0, solved:false, sc:0, sw:0, sok:false, sh:0}; }
+function persist(){ if(S) save(STORE, S); }
+function curQ(){ return S.sim ? variantFor(S.i + 1, S.sim) : P[S.i]; }
+function rec(){ return S.rec[S.i]; }
+function cleared(){ var n = 0; S.cl.forEach(function(v){ if(v) n++; }); return n; }
+function allCleared(){ return cleared() === P.length; }
+
+/* ---------- sound ---------- */
+var pref = load(PREFS) || {};
+if(typeof pref.music !== 'boolean') pref.music = true;
+if(typeof pref.sfx !== 'boolean') pref.sfx = true;
+var AC = null, outBus = null, musicBus = null, sfxBus = null, reverb = null, noiseBuf = null, musicTimer = null, nextT = 0, stepI = 0;
+var MUSIC_VOL = 0.5, SFX_VOL = 0.8, EIGHTH = 60/92/2;
+function mtof(m){ return 440*Math.pow(2, (m - 69)/12); }
+function makeNoise(sec){ var n = Math.floor(AC.sampleRate*sec), b = AC.createBuffer(1, n, AC.sampleRate), d = b.getChannelData(0); for(var i = 0; i < n; i++) d[i] = Math.random()*2 - 1; return b; }
+function makeImpulse(sec, decay){ var n = Math.floor(AC.sampleRate*sec), b = AC.createBuffer(2, n, AC.sampleRate); for(var c = 0; c < 2; c++){ var d = b.getChannelData(c); for(var i = 0; i < n; i++) d[i] = (Math.random()*2 - 1)*Math.pow(1 - i/n, decay); } return b; }
+
+/* a slow, creepy waltz in A minor: music-box melody, oom-pah-pah chords, a church bell, wind */
+var BARS = [
+  ['Am', [[76,2],[72,2],[69,2]]], ['Am', [[71,2],[68,2],[71,2]]], ['Dm', [[74,2],[69,2],[65,2]]], ['Am', [[64,4],[0,2]]],
+  ['F',  [[77,2],[72,2],[69,2]]], ['E',  [[76,2],[71,2],[68,2]]], ['Am', [[69,2],[72,2],[76,2]]], ['E',  [[71,3],[68,1],[64,2]]],
+  ['Am', [[81,2],[80,1],[81,1],[76,2]]], ['Dm', [[77,2],[74,1],[77,1],[81,2]]], ['Am', [[76,2],[72,2],[69,2]]], ['E',  [[68,2],[71,2],[74,2]]],
+  ['F',  [[72,2],[77,2],[81,2]]], ['Dm', [[74,2],[77,2],[74,2]]], ['E',  [[76,2],[71,2],[68,2]]], ['Am', [[69,4],[0,2]]]
+];
+var CHORD = {Am:{r:45, s:[57,60,64]}, Dm:{r:50, s:[57,62,65]}, F:{r:53, s:[57,60,65]}, E:{r:52, s:[56,59,64]}};
+var EV = [];
+(function(){
+  BARS.forEach(function(b, bi){
+    var base = bi*6, ch = CHORD[b[0]], pos = 0, k;
+    for(k = 0; k < 6; k++) EV[base + k] = {m:null, b:null, s:null};
+    EV[base].b = ch.r; EV[base + 2].s = ch.s; EV[base + 4].s = ch.s;
+    b[1].forEach(function(n){ if(n[0]) EV[base + pos].m = n; pos += n[1]; });
+  });
+})();
+function tone(type, f, t, dur, v, dest, f2){
+  var o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t); if(f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(dest || sfxBus); o.start(t); o.stop(t + dur + 0.05);
+}
+function box(f, t, dur, v){
+  var len = 0.55 + Math.min(dur, 1.4)*0.8, g = AC.createGain(), g2 = AC.createGain(), o = AC.createOscillator(), o2 = AC.createOscillator(), o3 = AC.createOscillator();
+  o.type = 'sine'; o.frequency.value = f; o3.type = 'sine'; o3.frequency.value = f; o3.detune.value = 14;
+  o2.type = 'triangle'; o2.frequency.value = f*2; g2.gain.value = 0.3;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+  o.connect(g); o3.connect(g); o2.connect(g2); g2.connect(g); g.connect(musicBus);
+  [o, o2, o3].forEach(function(x){ x.start(t); x.stop(t + len + 0.05); });
+}
+function bassNote(f, t){
+  var o = AC.createOscillator(), lp = AC.createBiquadFilter(), g = AC.createGain();
+  o.type = 'triangle'; o.frequency.value = f; lp.type = 'lowpass'; lp.frequency.value = 420;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.42, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.0);
+  o.connect(lp); lp.connect(g); g.connect(musicBus); o.start(t); o.stop(t + 1.05);
+}
+function stab(notes, t){
+  notes.forEach(function(m){
+    var o = AC.createOscillator(), lp = AC.createBiquadFilter(), g = AC.createGain();
+    o.type = 'triangle'; o.frequency.value = mtof(m); lp.type = 'lowpass'; lp.frequency.value = 950;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.085, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.3);
+    o.connect(lp); lp.connect(g); g.connect(musicBus); o.start(t); o.stop(t + 0.35);
+  });
+}
+function bell(t){
+  [[1,0.16,4.2],[2.4,0.08,3],[3,0.06,2.4],[4.1,0.04,1.6],[5.4,0.03,1.2]].forEach(function(p){
+    var o = AC.createOscillator(), g = AC.createGain();
+    o.type = 'sine'; o.frequency.value = 164.8*p[0];
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(p[1], t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + p[2]);
+    o.connect(g); g.connect(musicBus); o.start(t); o.stop(t + p[2] + 0.1);
+  });
+}
+function playStep(i, t){
+  var e = EV[i];
+  if(e.m) box(mtof(e.m[0]), t, e.m[1]*EIGHTH, 0.32);
+  if(e.b) bassNote(mtof(e.b), t);
+  if(e.s) stab(e.s, t);
+  if(i === 0) bell(t);
+}
+function schedule(){
+  if(!AC) return;
+  if(nextT < AC.currentTime - 0.1) nextT = AC.currentTime + 0.05;
+  while(nextT < AC.currentTime + 0.4){ playStep(stepI, nextT); nextT += EIGHTH; stepI = (stepI + 1) % EV.length; }
+}
+function startMusic(){ if(!AC || musicTimer) return; nextT = AC.currentTime + 0.12; musicTimer = setInterval(schedule, 90); }
+function stopMusic(){ if(musicTimer){ clearInterval(musicTimer); musicTimer = null; } }
+function startAmbience(){
+  var t = AC.currentTime, g = AC.createGain(), lfo = AC.createOscillator(), lg = AC.createGain();
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.16, t + 5); g.connect(musicBus);
+  [[55,'sine',1],[82.41,'sine',1],[110.5,'triangle',0.5]].forEach(function(p){ var o = AC.createOscillator(), og = AC.createGain(); o.type = p[1]; o.frequency.value = p[0]; og.gain.value = p[2]; o.connect(og); og.connect(g); o.start(t); });
+  lfo.frequency.value = 0.09; lg.gain.value = 0.05; lfo.connect(lg); lg.connect(g.gain); lfo.start(t);
+  var w = AC.createBufferSource(), bp = AC.createBiquadFilter(), wg = AC.createGain(), l2 = AC.createOscillator(), l2g = AC.createGain();
+  w.buffer = noiseBuf; w.loop = true; bp.type = 'bandpass'; bp.frequency.value = 420; bp.Q.value = 0.7; wg.gain.value = 0.05;
+  l2.frequency.value = 0.13; l2g.gain.value = 0.035; l2.connect(l2g); l2g.connect(wg.gain); l2.start(t);
+  w.connect(bp); bp.connect(wg); wg.connect(musicBus); w.start(t);
+}
+function audioInit(){
+  if(AC){ if(AC.state === 'suspended'){ try{ AC.resume(); }catch(e){} } return; }
+  var C = window.AudioContext || window.webkitAudioContext; if(!C) return;
+  try{
+    AC = new C();
+    outBus = AC.createGain(); outBus.gain.value = 0.85; outBus.connect(AC.destination);
+    reverb = AC.createConvolver(); reverb.buffer = makeImpulse(2.6, 2.2);
+    var wet = AC.createGain(); wet.gain.value = 0.36; reverb.connect(wet); wet.connect(outBus);
+    noiseBuf = makeNoise(3);
+    musicBus = AC.createGain(); musicBus.gain.value = pref.music ? MUSIC_VOL : 0; musicBus.connect(outBus); musicBus.connect(reverb);
+    sfxBus = AC.createGain(); sfxBus.gain.value = pref.sfx ? SFX_VOL : 0; sfxBus.connect(outBus);
+    startAmbience();
+    if(pref.music) startMusic();
+  }catch(e){ AC = null; }
+}
+function applyAudio(){
+  if(!AC) return;
+  var t = AC.currentTime;
+  musicBus.gain.setTargetAtTime(pref.music ? MUSIC_VOL : 0, t, 0.08);
+  sfxBus.gain.setTargetAtTime(pref.sfx ? SFX_VOL : 0, t, 0.03);
+  if(pref.music) startMusic(); else stopMusic();
+}
+function paintAudioBtns(){
+  $('musicBtn').textContent = pref.music ? '🎵 Music on' : '🔇 Music off'; $('musicBtn').setAttribute('aria-pressed', pref.music ? 'true' : 'false');
+  $('sfxBtn').textContent = pref.sfx ? '🔔 Effects on' : '🔕 Effects off'; $('sfxBtn').setAttribute('aria-pressed', pref.sfx ? 'true' : 'false');
+}
+$('musicBtn').onclick = function(){ pref.music = !pref.music; save(PREFS, pref); audioInit(); applyAudio(); paintAudioBtns(); };
+$('sfxBtn').onclick = function(){ pref.sfx = !pref.sfx; save(PREFS, pref); audioInit(); applyAudio(); paintAudioBtns(); };
+function unlockAudio(){ document.removeEventListener('pointerdown', unlockAudio); document.removeEventListener('keydown', unlockAudio); if(pref.music || pref.sfx) audioInit(); }
+document.addEventListener('pointerdown', unlockAudio);
+document.addEventListener('keydown', unlockAudio);
+document.addEventListener('visibilitychange', function(){ if(!AC) return; try{ if(document.hidden) AC.suspend(); else AC.resume(); }catch(e){} });
+var sfx = {
+  ok: function(){ if(!AC || !pref.sfx) return; var t = AC.currentTime; [659.25, 830.61, 987.77].forEach(function(f, k){ tone('triangle', f, t + k*0.09, 0.3, 0.2); }); },
+  bad: function(){ if(!AC || !pref.sfx) return; var t = AC.currentTime; tone('sawtooth', 150, t, 0.35, 0.15, null, 70); tone('square', 75, t, 0.35, 0.07, null, 50); },
+  piece: function(){ if(!AC || !pref.sfx) return; var t = AC.currentTime; [880, 1108.73, 1318.51, 1760, 2217.46].forEach(function(f, k){ tone('sine', f, t + 0.25 + k*0.075, 0.6, 0.15); }); tone('triangle', 440, t + 0.25, 0.9, 0.12); },
+  win: function(){ if(!AC || !pref.sfx) return; var t = AC.currentTime; [440, 523.25, 659.25, 880, 1046.5, 1318.51, 1760].forEach(function(f, k){ tone('triangle', f, t + k*0.13, 1.0, 0.16); tone('sine', f*2, t + k*0.13, 0.7, 0.05); }); },
+  step: function(){
+    if(!AC || !pref.sfx || !noiseBuf) return;
+    var t = AC.currentTime, s = AC.createBufferSource(), f = AC.createBiquadFilter(), g = AC.createGain();
+    s.buffer = noiseBuf; f.type = 'lowpass'; f.frequency.value = 260;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.18, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+    s.connect(f); f.connect(g); g.connect(sfxBus); s.start(t, Math.random()*1.5); s.stop(t + 0.1);
+  },
+  creak: function(){
+    if(!AC || !pref.sfx) return;
+    var t = AC.currentTime, o = AC.createOscillator(), f = AC.createBiquadFilter(), g = AC.createGain(), lfo = AC.createOscillator(), lg = AC.createGain();
+    o.type = 'sawtooth'; o.frequency.setValueAtTime(90, t); o.frequency.linearRampToValueAtTime(200, t + 0.5); o.frequency.linearRampToValueAtTime(120, t + 1.0);
+    lfo.frequency.value = 23; lg.gain.value = 18; lfo.connect(lg); lg.connect(o.frequency);
+    f.type = 'bandpass'; f.frequency.setValueAtTime(600, t); f.frequency.linearRampToValueAtTime(1100, t + 0.6); f.Q.value = 7;
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.32, t + 0.1); g.gain.linearRampToValueAtTime(0.0001, t + 1.05);
+    o.connect(f); f.connect(g); g.connect(sfxBus); o.start(t); lfo.start(t); o.stop(t + 1.1); lfo.stop(t + 1.1);
+  }
+};
+
+/* ---------- views ---------- */
+var VIEWS = ['vStart','vHouse','vRoom','vDone','vTeacher'];
+function show(v){
+  VIEWS.forEach(function(id){ $(id).hidden = (id !== v); });
+  $('teacherLink').hidden = (v === 'vTeacher');
+  var who = $('who');
+  if(S && S.name && v !== 'vTeacher' && v !== 'vStart'){ who.hidden = false; who.innerHTML = 'Ghost hunter: <b>' + esc(S.name) + '</b>'; }
+  else who.hidden = true;
+  if(v === 'vHouse') enterHub(); else stopLoop();
+}
+function route(){
+  if(location.hash === '#teacher'){ show('vTeacher'); return; }
+  if(!S){ show('vStart'); return; }
+  if(S.finishedAt){ renderDone(); show('vDone'); return; }
+  if(S.i !== null){ show('vRoom'); renderItem(); return; }
+  show('vHouse');
+}
+function transition(fn){
+  var f = $('fade');
+  if(REDUCED){ fn(); return; }
+  f.classList.add('on');
+  setTimeout(function(){ fn(); setTimeout(function(){ f.classList.remove('on'); }, 60); }, 380);
+}
+var toastT = null;
+function toast(t){ var e = $('toast'); e.textContent = t; clearTimeout(toastT); toastT = setTimeout(function(){ e.textContent = ''; }, 3600); }
+
+/* ---------- start ---------- */
+$('startBtn').onclick = function(){
+  var name = $('nameIn').value.replace(/[\u0000-\u001f]/g,'').replace(/\s+/g,' ').trim();
+  if(normName(name).length < 2 || name.indexOf(' ') < 0){ $('startMsg').textContent = 'Type your first and last name.'; return; }
+  var attempt = (load(ATTEMPTS) || 0) + 1; save(ATTEMPTS, attempt);
+  S = {name:name, rec:P.map(freshRec), cl:P.map(function(){ return 0; }), i:null, sim:null, h:0, phase:'ask', msg:null, got:null, g:0, x:8, startedAt:Date.now(), finishedAt:null, attempt:attempt};
+  persist(); pts = [];
+  audioInit(); sfx.creak();
+  show('vHouse'); window.scrollTo(0, 0);
+};
+$('nameIn').addEventListener('keydown', function(e){ if(e.key === 'Enter') $('startBtn').click(); });
+
+/* ---------- the puzzle picture ---------- */
+function puzzleSvg(){
+  var h = '<svg class="pz" viewBox="0 0 520 330" role="img" aria-label="Puzzle picture with ' + cleared() + ' of ' + P.length + ' pieces found">';
+  CELLS.forEach(function(c, i){
+    var st = S.cl[i], x = c.x + 2, y = c.y + 2, w = c.w - 4, ht = c.h - 4;
+    if(st){
+      h += '<g' + (S.got === i ? ' class="pop"' : '') + '><g clip-path="url(#clip' + i + ')"><use href="#scene"/></g><rect class="edge st' + st + '" x="' + x + '" y="' + y + '" width="' + w + '" height="' + ht + '" rx="8"/></g>';
+    } else {
+      h += '<g><rect class="slot" x="' + x + '" y="' + y + '" width="' + w + '" height="' + ht + '" rx="8"/><text class="qm" x="' + (c.x + c.w/2) + '" y="' + (c.y + 70) + '">?</text><text class="qn" x="' + (c.x + 12) + '" y="' + (c.y + 26) + '">' + (i + 1) + '</text></g>';
+    }
+  });
+  return h + '</svg>';
+}
+function buildClips(){
+  $('clips').innerHTML = CELLS.map(function(c, i){ return '<clipPath id="clip' + i + '"><rect x="' + (c.x + 2) + '" y="' + (c.y + 2) + '" width="' + (c.w - 4) + '" height="' + (c.h - 4) + '" rx="8"/></clipPath>'; }).join('');
+}
+function renderBoard(){
+  $('board').innerHTML = puzzleSvg();
+  $('cnt').textContent = cleared();
+  S.got = null;
+}
+
+/* ---------- the house ---------- */
+function stairHtml(x, dir, mirror){
+  return '<span class="stair ' + dir + (mirror ? ' mirror' : '') + '" style="left:' + x + '%" aria-hidden="true"><svg viewBox="0 0 40 50" preserveAspectRatio="xMidYMax meet"><use href="#stair' + (dir === 'up' ? 'up' : 'dn') + '"/></svg><i>' + (dir === 'up' ? '▲' : '▼') + '</i></span>';
+}
+function buildHouse(){
+  var h = '', row, g;
+  for(row = 0; row < 3; row++){
+    g = 2 - row;
+    h += '<div class="floor" data-g="' + g + '"><svg class="web tl" aria-hidden="true"><use href="#web"/></svg><svg class="web tr" aria-hidden="true"><use href="#web"/></svg>';
+    h += '<span class="flabel">' + ['Ground floor', 'Second floor', 'Attic'][g] + '</span>';
+    if(g === 2) h += '<span class="ghostf" aria-hidden="true">👻</span>';
+    if(g === 1) h += '<span class="ghostf g2" aria-hidden="true">👻</span>';
+    if(g === 0) h += '<span class="front" aria-hidden="true"></span>';
+    if(g < 2) h += stairHtml(STAIR[g], 'up', g === 1);
+    if(g > 0) h += stairHtml(STAIR[g - 1], 'down', false);
+    FLOORS[g].forEach(function(i){
+      h += '<button type="button" class="door" id="door' + i + '" data-i="' + i + '" style="left:' + DOORS[i].x + '%"><span class="inside"></span><span class="leaf"><span class="plate">' + (i + 1) + '</span></span></button>';
+    });
+    h += '</div>';
+  }
+  h += '<div class="player" id="player"><span class="bob"><span class="sprite" id="sprite" aria-hidden="true">🧙</span></span></div>';
+  $('floors').innerHTML = h;
+}
+function refreshDoors(){
+  DOORS.forEach(function(D){
+    var b = $('door' + D.i), st = S.cl[D.i];
+    b.className = 'door' + (st ? ' done' + (st === 2 ? ' help' : '') : '');
+    b.querySelector('.inside').textContent = st ? '🧩' : '';
+    b.setAttribute('aria-label', 'Door ' + (D.i + 1) + ', ' + ROOMS[D.i].name + (st ? ', open, puzzle piece collected' : ', closed'));
+  });
+}
+
+/* walking around */
+var SPEED = 0.036, pl = {g:0, x:8}, keys = {l:false, r:false}, queue = [], pendingOpen = null, pauseUntil = 0, lastTs = 0, stepAcc = 270, loopRun = false, nearI = null, nearKey = '', lastMoving = false, facing = 1;
+function hubVisible(){ return !$('vHouse').hidden; }
+function placePlayer(){
+  var p = $('player'); if(!p) return;
+  p.style.top = ((((2 - pl.g) + 1 - 0.07)/3)*100) + '%'; p.style.left = pl.x + '%';
+}
+function savePos(){ if(!S) return; S.g = pl.g; S.x = Math.round(pl.x*10)/10; persist(); }
+function stairNear(){ return {up: pl.g < 2 && Math.abs(pl.x - STAIR[pl.g]) < 6, down: pl.g > 0 && Math.abs(pl.x - STAIR[pl.g - 1]) < 6}; }
+function useStairs(dir){
+  var k = dir > 0 ? pl.g : pl.g - 1;
+  if(k < 0 || k > 1 || Math.abs(pl.x - STAIR[k]) >= 6) return false;
+  queue = []; pendingOpen = null; pl.x = STAIR[k]; pl.g += dir;
+  pauseUntil = performance.now() + 480; placePlayer(); sfx.step(); savePos(); return true;
+}
+function planRoute(i){
+  var D = DOORS[i], q = [], g = pl.g, up, sx;
+  while(g !== D.g){ up = D.g > g; sx = STAIR[up ? g : g - 1]; q.push({g:g, x:sx}); g += up ? 1 : -1; q.push({g:g, x:sx}); }
+  q.push({g:D.g, x:D.x});
+  return q;
+}
+function arrived(){ savePos(); if(pendingOpen !== null){ var i = pendingOpen; pendingOpen = null; openDoor(i); } }
+function checkNear(){
+  var nd = null;
+  DOORS.forEach(function(D){ if(D.g === pl.g && Math.abs(D.x - pl.x) < 4.2) nd = D.i; });
+  var ns = stairNear(), k = nd + '|' + ns.up + '|' + ns.down + '|' + pl.g + '|' + (S ? cleared() : 0);
+  if(k === nearKey) return;
+  nearKey = k; nearI = nd; updateNear(ns);
+}
+function updateNear(ns){
+  DOORS.forEach(function(D){ var b = $('door' + D.i); if(b) b.classList.toggle('near', nearI === D.i); });
+  $('upBtn').disabled = !ns.up; $('downBtn').disabled = !ns.down;
+  $('openBtn').disabled = (nearI === null) || !!S.cl[nearI];
+  var hint;
+  if(nearI !== null) hint = S.cl[nearI] ? 'Door ' + (nearI + 1) + ' is already open, and its puzzle piece is yours.' : 'You’re at door ' + (nearI + 1) + ', ' + ROOMS[nearI].name + '. Press Enter or tap Open door to go in.';
+  else if(ns.up || ns.down) hint = 'A staircase! Press ' + (ns.up && ns.down ? '▲ or ▼' : ns.up ? '▲ (up arrow)' : '▼ (down arrow)') + ' to climb.';
+  else hint = 'Walk with ◀ ▶ or the arrow keys. Use the stairs to change floors. Or just tap a door and you’ll walk there.';
+  $('hint').textContent = hint;
+}
+function tick(ts){
+  if(!loopRun) return;
+  var dt = lastTs ? Math.min(60, ts - lastTs) : 16, mv = 0;
+  lastTs = ts;
+  if(ts >= pauseUntil){
+    if(keys.l && !keys.r) mv = -1; else if(keys.r && !keys.l) mv = 1;
+    if(mv !== 0){ if(queue.length){ queue = []; pendingOpen = null; } }
+    else if(queue.length){
+      var w = queue[0];
+      if(w.g !== pl.g){ pl.g = w.g; pauseUntil = ts + 480; placePlayer(); queue.shift(); savePos(); if(!queue.length) arrived(); }
+      else {
+        var d = w.x - pl.x, sp = SPEED*dt;
+        if(Math.abs(d) <= sp){ pl.x = w.x; queue.shift(); if(!queue.length) arrived(); }
+        else mv = d > 0 ? 1 : -1;
+      }
+    }
+    if(mv !== 0){ pl.x = Math.max(4, Math.min(96, pl.x + mv*SPEED*dt)); facing = mv; }
+  }
+  var moving = mv !== 0, p = $('player'), sp2 = $('sprite');
+  if(p){ p.style.left = pl.x + '%'; p.classList.toggle('walking', moving); }
+  if(sp2) sp2.style.transform = 'scaleX(' + facing + ')';
+  if(moving){ stepAcc += dt; if(stepAcc > 280){ stepAcc = 0; sfx.step(); } } else stepAcc = 270;
+  if(lastMoving && !moving) savePos();
+  lastMoving = moving;
+  checkNear();
+  requestAnimationFrame(tick);
+}
+function startLoop(){ if(loopRun) return; loopRun = true; lastTs = 0; requestAnimationFrame(tick); }
+function stopLoop(){ loopRun = false; keys.l = false; keys.r = false; }
+function enterHub(){
+  pl.g = S.g || 0; pl.x = typeof S.x === 'number' ? S.x : 8; queue = []; pendingOpen = null; pauseUntil = 0; nearKey = ''; nearI = null;
+  refreshDoors(); placePlayer(); renderBoard(); checkNear(); startLoop();
+}
+function onDoorClick(i){
+  if(!S || S.i !== null) return;
+  var D = DOORS[i];
+  if(S.cl[i]){ toast('Door ' + (i + 1) + ' is already open. Its puzzle piece is yours.'); return; }
+  if(D.g === pl.g && Math.abs(D.x - pl.x) < 4.2){ openDoor(i); return; }
+  keys.l = false; keys.r = false; queue = planRoute(i); pendingOpen = i;
+}
+function openDoor(i){
+  if(!S || S.i !== null) return;
+  if(S.cl[i]){ toast('Door ' + (i + 1) + ' is already open. Its puzzle piece is yours.'); return; }
+  sfx.creak();
+  queue = []; pendingOpen = null; keys.l = false; keys.r = false; savePos();
+  transition(function(){
+    S.i = i; S.sim = null; S.h = 0; S.phase = 'ask'; S.msg = null; pts = [];
+    persist(); show('vRoom'); renderItem(); window.scrollTo(0, 0);
+  });
+}
+$('floors').addEventListener('click', function(e){
+  var b = e.target.closest ? e.target.closest('.door') : null;
+  if(b) onDoorClick(+b.getAttribute('data-i'));
+});
+$('openBtn').onclick = function(){ if(nearI !== null) openDoor(nearI); };
+$('upBtn').onclick = function(){ useStairs(1); };
+$('downBtn').onclick = function(){ useStairs(-1); };
+function holdBtn(id, key){
+  var b = $(id);
+  function down(e){ e.preventDefault(); keys[key] = true; b.classList.add('on'); try{ b.setPointerCapture(e.pointerId); }catch(_){} }
+  function up(){ keys[key] = false; b.classList.remove('on'); }
+  b.addEventListener('pointerdown', down);
+  b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up); b.addEventListener('lostpointercapture', up);
+}
+holdBtn('leftBtn', 'l'); holdBtn('rightBtn', 'r');
+$('pad').addEventListener('contextmenu', function(e){ e.preventDefault(); });
+document.addEventListener('keydown', function(e){
+  if(!S || !hubVisible() || e.ctrlKey || e.metaKey || e.altKey) return;
+  var tag = e.target && e.target.tagName;
+  if(tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  var k = e.key;
+  if(k === 'ArrowLeft' || k === 'a' || k === 'A'){ keys.l = true; e.preventDefault(); }
+  else if(k === 'ArrowRight' || k === 'd' || k === 'D'){ keys.r = true; e.preventDefault(); }
+  else if(k === 'ArrowUp' || k === 'w' || k === 'W'){ useStairs(1); e.preventDefault(); }
+  else if(k === 'ArrowDown' || k === 's' || k === 'S'){ useStairs(-1); e.preventDefault(); }
+  else if((k === 'Enter' || k === ' ') && tag !== 'BUTTON' && tag !== 'A'){ if(nearI !== null) openDoor(nearI); e.preventDefault(); }
+});
+document.addEventListener('keyup', function(e){
+  var k = e.key;
+  if(k === 'ArrowLeft' || k === 'a' || k === 'A') keys.l = false;
+  if(k === 'ArrowRight' || k === 'd' || k === 'D') keys.r = false;
+});
+window.addEventListener('blur', function(){ keys.l = false; keys.r = false; });
+
+
+/* ---------- rendering a problem ---------- */
+function inp(name, ph, label){ return '<input class="fld num" type="text" inputmode="text" id="f-' + name + '" data-f="' + name + '" autocomplete="off" autocapitalize="off" spellcheck="false"' + (ph ? ' placeholder="' + ph + '"' : '') + ' aria-label="' + esc(label || name) + '">'; }
+function sysHtml(list){ return '<div class="sys">' + list.map(function(t){ return '<div>' + t + '</div>'; }).join('') + '</div>'; }
+function workRow(e, name){
+  return '<div class="work"><span class="mathy">' + e.t + '</span><span>left side =</span>' + inp(name, '', 'Left side of ' + e.t) +
+    '<span class="muted small">compare with ' + fmt(e.c) + '</span></div>';
+}
+function typeRow(){
+  return '<label class="inline" for="f-type">How many solutions? <select class="fld" id="f-type" data-f="type"><option value="">Choose…</option><option value="one">One solution</option><option value="none">No solution</option><option value="inf">Infinitely many solutions</option></select></label>' +
+    '<label class="inline" for="f-sol">If there is one solution, write it as an ordered pair: ' + inp('sol', '(x, y)', 'Ordered pair solution').replace('class="fld num"', 'class="fld num" style="width:11ch"') + '</label>';
+}
+function bodyHtml(q){
+  var h = '';
+  if(q.kind === 'two'){
+    h += sysHtml(q.eqs.map(function(e){ return e.t; }));
+    h += '<p>Substitute each point into both equations. Type the value of the <b>left side</b> of each equation.</p>';
+    q.pts.forEach(function(p, k){
+      h += '<fieldset class="pt"><legend>Check ' + pairText(p) + '</legend>' + q.eqs.map(function(e, i){ return workRow(e, 'v' + k + i); }).join('') + '</fieldset>';
+    });
+    h += '<label class="inline" for="f-final">Which ordered pairs are solutions? <select class="fld" id="f-final" data-f="final"><option value="">Choose…</option><option value="none">Neither pair</option><option value="A">Only ' + pairText(q.pts[0]) + '</option><option value="B">Only ' + pairText(q.pts[1]) + '</option><option value="both">Both pairs</option></select></label>';
+  } else if(q.kind === 'one'){
+    h += '<p class="mathy" style="font-size:1.3rem">' + pairText(q.pt) + '</p>' + sysHtml(q.eqs.map(function(e){ return e.t; }));
+    h += '<p>Substitute x = ' + fmt(q.pt[0]) + ' and y = ' + fmt(q.pt[1]) + '. Type the value of the <b>left side</b> of each equation.</p>';
+    h += '<fieldset class="pt"><legend>Check ' + pairText(q.pt) + '</legend>' + q.eqs.map(function(e, i){ return workRow(e, 'v' + i); }).join('') + '</fieldset>';
+    h += '<label class="inline" for="f-final">Is ' + pairText(q.pt) + ' a solution of the system? <select class="fld" id="f-final" data-f="final"><option value="">Choose…</option><option value="yes">Yes</option><option value="no">No</option></select></label>';
+  } else if(q.kind === 'graph'){
+    h += sysHtml(q.eqs);
+    h += '<p class="step">Step 1: Show your work. Write each equation in slope-intercept form, y = mx + b.</p><p class="muted small">Type fractions like 1/2 or decimals like 0.5.</p>';
+    q.eqs.forEach(function(t, i){
+      h += '<div class="work"><span class="mathy">' + t + '</span><span>→ y =</span>' + inp('m' + i, 'm', 'Slope of equation ' + (i+1)) + '<span>x +</span>' + inp('b' + i, 'b', 'y-intercept of equation ' + (i+1)) + '</div>';
+    });
+    h += '<p class="step">Step 2: Graph both lines.</p><p class="muted small">Click two points on the first line (blue), then two points on the second line (red).</p>';
+    h += '<div class="plotwrap"><div class="plotbar"><span><i class="dot" style="background:var(--line1)"></i>' + q.eqs[0] + ' &nbsp; <i class="dot" style="background:var(--line2)"></i>' + q.eqs[1] + '</span><span class="coord" id="gcoord"></span></div>' +
+      '<canvas class="plot" id="gcanvas" tabindex="0" aria-label="Coordinate grid from −10 to 10. Click to place points for each line."></canvas>' +
+      '<div class="actions"><button class="btn" id="gundo" type="button">Undo point</button><button class="btn" id="gclear" type="button">Clear graph</button></div></div>';
+    h += '<p class="step">Step 3: Answer.</p>' + typeRow();
+  } else {
+    h += sysHtml(q.eqs);
+    h += '<p><a class="desmos" href="https://www.desmos.com/calculator" target="_blank" rel="noopener">Open Desmos in a new tab ↗</a></p>';
+    h += '<p class="muted small">Type both equations into Desmos. Click where the lines cross to see the point.</p>';
+    h += typeRow();
+  }
+  return h;
+}
+
+function nextStep(){
+  var r = rec();
+  if(!S.sim) return r.h >= HELP_LIMIT ? 'similar' : 'next';
+  if(r.sok) return 'next';
+  return r.sc < MAX_SIMILAR ? 'similar' : 'next';
+}
+function say(text, cls){ S.msg = text ? {text:text, cls:cls || ''} : null; }
+
+/* ---------- help ---------- */
+function formsList(q){ return '<ol>' + q.forms.map(function(f){ return '<li>' + f + '</li>'; }).join('') + '</ol>'; }
+function pairSolution(q){
+  var list = q.kind === 'two' ? q.pts : [q.pt], h = '';
+  list.forEach(function(p){
+    h += '<p><b>Check ' + pairText(p) + ':</b></p><ol>';
+    q.eqs.forEach(function(e){
+      var v = e.a*p[0] + e.b*p[1];
+      h += '<li>' + e.t + ' → ' + expr(e.a, e.b, p[0], p[1]) + ' = <b>' + fmt(v) + '</b>. Compare with ' + fmt(e.c) + ': <b>' + (v === e.c ? 'true' : 'false') + '</b></li>';
+    });
+    var ok = q.eqs.every(function(e){ return sat(p, e); });
+    h += '</ol><p>' + (ok ? 'Both equations are true, so ' + pairText(p) + ' <b>is</b> a solution.' : 'At least one equation is false, so ' + pairText(p) + ' is <b>not</b> a solution.') + '</p>';
+  });
+  return h;
+}
+function hint1(q){
+  if(q.kind === 'two' || q.kind === 'one') return '<p>Replace x and y with the numbers from the ordered pair, do the arithmetic, and compare the result with the right side of that equation. A point is a solution only if it makes <b>both</b> equations true.</p>';
+  if(q.kind === 'graph') return '<p>Get y by itself in each equation so it looks like y = mx + b. Whatever you do to one side, do to the other side. Then plot the y-intercept b on the y-axis and use the slope m (rise over run) to find a second point.</p>';
+  return '<p>Type each equation into Desmos exactly as written. If the lines cross once, click the crossing point to see its coordinates. If they never meet, there is no solution. If one line sits right on top of the other, there are infinitely many solutions.</p>';
+}
+function hint2(q){
+  if(q.kind === 'two' || q.kind === 'one'){
+    var p = q.kind === 'two' ? q.pts[0] : q.pt, e = q.eqs[0], v = e.a*p[0] + e.b*p[1];
+    return '<p>Here is the first one done for you. Put ' + pairText(p) + ' into ' + e.t + ': ' + expr(e.a, e.b, p[0], p[1]) + ' = ' + fmt(v) + '. ' +
+      (v === e.c ? 'That equals ' + fmt(e.c) + ', so this equation is true.' : 'That is not ' + fmt(e.c) + ', so this equation is false, which means ' + pairText(p) + ' is not a solution.') +
+      '</p><p>Now do the same thing for the rest.</p>';
+  }
+  return '<p>Here is each equation in slope-intercept form:</p>' + formsList(q) +
+    '<p>Now compare the lines. <b>Different slopes</b>: one solution where they cross. <b>Same slope, different y-intercepts</b>: no solution. <b>Same slope and same y-intercept</b>: infinitely many solutions.</p>';
+}
+function solutionHtml(q){
+  if(q.kind === 'two' || q.kind === 'one'){
+    var h = pairSolution(q);
+    if(q.kind === 'two'){
+      var v = q.pts.map(function(p){ return q.eqs.every(function(e){ return sat(p, e); }); });
+      h += '<p>Answer: <b>' + (v[0] && v[1] ? 'both pairs' : v[0] ? 'only ' + pairText(q.pts[0]) : v[1] ? 'only ' + pairText(q.pts[1]) : 'neither pair') + '</b>.</p>';
+    }
+    return h;
+  }
+  var ans = q.type === 'one' ? 'one solution, <b>' + pairText(q.sol) + '</b>' : '<b>' + TYPE_NAME[q.type].toLowerCase() + '</b>';
+  return '<ol>' + q.forms.map(function(f){ return '<li>' + f + '</li>'; }).join('') + '<li>' + q.fin + '</li></ol><p>Answer: ' + ans + '.</p><canvas class="plot small" id="hcanvas" aria-label="Graph of both lines"></canvas>';
+}
+function renderHelp(){
+  var q = curQ(), box = $('helpBox'), h = '';
+  if(S.h >= 1) h += '<section><h4>Hint</h4>' + hint1(q) + '</section>';
+  if(S.h >= 2) h += '<section><h4>More help</h4>' + hint2(q) + '</section>';
+  if(S.h >= 3) h += '<section><h4>Full solution</h4>' + solutionHtml(q) + '</section>';
+  box.innerHTML = h; box.hidden = !h;
+  if(S.h >= 3 && q.lines) requestAnimationFrame(function(){ drawBoard($('hcanvas'), q, {answer:true}); });
+}
+
+/* ---------- graphing ---------- */
+function drawBoard(cv, q, o){
+  if(!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d'); if(!ctx) return;
+  var size = cv.clientWidth || 300, dpr = window.devicePixelRatio || 1;
+  cv.width = cv.height = Math.round(size*dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  var L = 11, sc = size/(2*L);
+  function X(x){ return (x + L)*sc; } function Y(y){ return (L - y)*sc; }
+  var cs = getComputedStyle(document.documentElement);
+  function css(n){ return cs.getPropertyValue(n).trim(); }
+  ctx.clearRect(0, 0, size, size);
+  ctx.lineWidth = 1; ctx.strokeStyle = css('--plot-grid');
+  for(var i = -10; i <= 10; i++){
+    ctx.beginPath(); ctx.moveTo(X(i), Y(-10.5)); ctx.lineTo(X(i), Y(10.5)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(X(-10.5), Y(i)); ctx.lineTo(X(10.5), Y(i)); ctx.stroke();
+  }
+  ctx.strokeStyle = css('--axis'); ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(X(0), 0); ctx.lineTo(X(0), size); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, Y(0)); ctx.lineTo(size, Y(0)); ctx.stroke();
+  ctx.fillStyle = css('--axis'); ctx.font = Math.max(9, size/36) + 'px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for(var t = -10; t <= 10; t += 2){ if(t !== 0) ctx.fillText(String(t).replace('-', '−'), X(t), Y(0) + 3); }
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  for(var u = -10; u <= 10; u += 2){ if(u !== 0) ctx.fillText(String(u).replace('-', '−'), X(0) - 4, Y(u)); }
+  function seg(ln, color, w, dash){
+    ctx.strokeStyle = color; ctx.lineWidth = w; ctx.setLineDash(dash || []);
+    ctx.beginPath(); ctx.moveTo(X(-L), Y(ln.m*-L + ln.b)); ctx.lineTo(X(L), Y(ln.m*L + ln.b)); ctx.stroke(); ctx.setLineDash([]);
+  }
+  var same = Math.abs(q.lines[0].m - q.lines[1].m) < 1e-9 && Math.abs(q.lines[0].b - q.lines[1].b) < 1e-9;
+  if(o.answer){
+    seg(q.lines[0], css('--line1'), same ? 6 : 3);
+    seg(q.lines[1], css('--line2'), same ? 2 : 3, same ? [7,6] : null);
+  }
+  var Pt = o.pts || [];
+  function pseg(p1, p2, color){
+    ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.beginPath();
+    if(p1[0] === p2[0]){ ctx.moveTo(X(p1[0]), Y(-L)); ctx.lineTo(X(p1[0]), Y(L)); }
+    else { var m = (p2[1] - p1[1])/(p2[0] - p1[0]); ctx.moveTo(X(-L), Y(p1[1] + m*(-L - p1[0]))); ctx.lineTo(X(L), Y(p1[1] + m*(L - p1[0]))); }
+    ctx.stroke();
+  }
+  if(Pt.length >= 2) pseg(Pt[0], Pt[1], css('--line1'));
+  if(Pt.length >= 4) pseg(Pt[2], Pt[3], css('--line2'));
+  ctx.font = 'bold ' + Math.max(10, size/32) + 'px sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+  Pt.forEach(function(pt, i){
+    ctx.fillStyle = i < 2 ? css('--line1') : css('--line2'); ctx.beginPath(); ctx.arc(X(pt[0]), Y(pt[1]), 6, 0, 6.2832); ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = css('--plot-bg'); ctx.stroke();
+    ctx.fillStyle = css('--ink'); ctx.fillText(pairText(pt), X(pt[0]) + 9, Y(pt[1]) - 6);
+  });
+  if(o.answer && q.type === 'one'){
+    ctx.strokeStyle = css('--ok'); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(X(q.sol[0]), Y(q.sol[1]), 9, 0, 6.2832); ctx.stroke();
+    ctx.fillStyle = css('--ink'); ctx.font = 'bold ' + Math.max(10, size/30) + 'px sans-serif';
+    ctx.fillText(pairText(q.sol), X(q.sol[0]) + 12, Y(q.sol[1]) - 6);
+  }
+}
+function lineFrom(a, b){ if(a[0] === b[0]) return null; var m = (b[1] - a[1])/(b[0] - a[0]); return {m:m, b:a[1] - m*a[0]}; }
+function redrawInput(){ var cv = $('gcanvas'); if(cv && S && S.i !== null && curQ().kind === 'graph') drawBoard(cv, curQ(), {pts:pts, answer:false}); }
+function bindGraph(){
+  var cv = $('gcanvas'); if(!cv) return;
+  function toGrid(e){
+    var r = cv.getBoundingClientRect(), L = 11;
+    var x = Math.round(((e.clientX - r.left)/r.width)*2*L - L), y = Math.round(L - ((e.clientY - r.top)/r.height)*2*L);
+    return [Math.max(-10, Math.min(10, x)), Math.max(-10, Math.min(10, y))];
+  }
+  function touched(){ cv.classList.remove('ok','bad','missing'); redrawInput(); }
+  cv.addEventListener('click', function(e){
+    if(S.phase !== 'ask') return;
+    var g = toGrid(e);
+    if(pts.length >= 4){ say('You already have 4 points. Use Undo point or Clear graph to change them.', 'info'); renderControls(); return; }
+    if(pts.length % 2 === 1 && pts[pts.length-1][0] === g[0] && pts[pts.length-1][1] === g[1]) return;
+    pts.push(g); touched();
+  });
+  cv.addEventListener('pointermove', function(e){ $('gcoord').textContent = pairText(toGrid(e)); });
+  cv.addEventListener('pointerleave', function(){ $('gcoord').textContent = ''; });
+  $('gundo').onclick = function(){ if(S.phase === 'ask'){ pts.pop(); touched(); } };
+  $('gclear').onclick = function(){ if(S.phase === 'ask'){ pts = []; touched(); } };
+  requestAnimationFrame(redrawInput);
+}
+
+/* ---------- checking ---------- */
+function evaluate(q){
+  var marks = {}, blank = false;
+  function fld(n){ return $('qBody').querySelector('[data-f="' + n + '"]'); }
+  function need(n, test){ var el = fld(n); if(!el.value.trim()){ blank = true; marks[n] = null; } else marks[n] = !!test(el.value); }
+  if(q.kind === 'two'){
+    q.pts.forEach(function(p, k){ q.eqs.forEach(function(e, i){ need('v' + k + i, function(v){ return near(v, e.a*p[0] + e.b*p[1]); }); }); });
+    var val = q.pts.map(function(p){ return q.eqs.every(function(e){ return sat(p, e); }); });
+    var exp = val[0] && val[1] ? 'both' : val[0] ? 'A' : val[1] ? 'B' : 'none';
+    need('final', function(v){ return v === exp; });
+  } else if(q.kind === 'one'){
+    q.eqs.forEach(function(e, i){ need('v' + i, function(v){ return near(v, e.a*q.pt[0] + e.b*q.pt[1]); }); });
+    var truth = q.eqs.every(function(e){ return sat(q.pt, e); }) ? 'yes' : 'no';
+    need('final', function(v){ return v === truth; });
+  } else {
+    if(q.kind === 'graph'){
+      q.lines.forEach(function(Ln, i){
+        need('m' + i, function(v){ return near(v, Ln.m, 0.006); });
+        need('b' + i, function(v){ return near(v, Ln.b, 0.006); });
+      });
+      if(pts.length < 4){ blank = true; marks.graph = null; }
+      else {
+        var ls = [lineFrom(pts[0], pts[1]), lineFrom(pts[2], pts[3])];
+        var same = function(a, t){ return a && Math.abs(a.m - t.m) < 1e-6 && Math.abs(a.b - t.b) < 1e-6; };
+        var uniq = q.lines.filter(function(t, i, arr){ return arr.findIndex(function(u){ return same(u, t); }) === i; });
+        var idx = ls.map(function(a){ return uniq.findIndex(function(t){ return same(a, t); }); });
+        marks.graph = idx.every(function(i){ return i >= 0; }) && uniq.every(function(t, i){ return idx.indexOf(i) >= 0; });
+      }
+    }
+    need('type', function(v){ return v === q.type; });
+    if(fld('type').value === 'one') need('sol', function(v){ return q.type === 'one' && norm(v) === q.sol[0] + ',' + q.sol[1]; });
+  }
+  Object.keys(marks).forEach(function(n){
+    var el = n === 'graph' ? $('gcanvas') : fld(n); if(!el) return;
+    el.classList.remove('ok','bad','missing');
+    if(marks[n] === null) el.classList.add('missing');
+    else if(!blank) el.classList.add(marks[n] ? 'ok' : 'bad');
+  });
+  return {blank:blank, ok:!blank && Object.keys(marks).every(function(n){ return marks[n] === true; })};
+}
+
+/* ---------- teacher code ---------- */
+function pushBits(arr, v, n){ for(var k = n - 1; k >= 0; k--) arr.push((v >>> k) & 1); }
+function readBits(arr, pos, n){ var v = 0; for(var k = 0; k < n; k++) v = v*2 + arr[pos + k]; return v; }
+var CODE_BITS = 250, BODY_BITS = 224;
+function makeCode(st){
+  var b = [], nm = normName(st.name);
+  pushBits(b, 1, 3);
+  pushBits(b, Math.min(15, st.attempt || 1), 4);
+  pushBits(b, Math.min(255, Math.max(0, Math.round((st.finishedAt - st.startedAt)/60000))), 8);
+  pushBits(b, 1, 1);
+  st.rec.forEach(function(r){
+    pushBits(b, Math.min(15, r.w), 4); pushBits(b, r.h, 2); pushBits(b, r.solved ? 1 : 0, 1);
+    pushBits(b, Math.min(3, r.sc), 2); pushBits(b, Math.min(15, r.sw), 4); pushBits(b, r.sok ? 1 : 0, 1); pushBits(b, r.sh, 2);
+  });
+  pushBits(b, hash(SALT + '|' + nm + '|' + b.join('')) % 67108864, 26);
+  var ks = prng(hash(SALT + '#' + nm));
+  for(var i = 0; i < b.length; i++) b[i] ^= (ks() < 0.5 ? 1 : 0);
+  var s = '';
+  for(i = 0; i < CODE_BITS; i += 5) s += ALPH[readBits(b, i, 5)];
+  return s.match(/.{5}/g).join('-');
+}
+function readCode(name, code){
+  var nm = normName(name);
+  if(nm.length < 2) return {err:'Type the student’s name.'};
+  var c = String(code).toUpperCase().replace(/O/g, '0').replace(/[IL]/g, '1').replace(/[^0-9A-Z]/g, '');
+  if(c.length !== CODE_BITS/5) return {err:'That code is not the right length. It should be 50 letters and numbers.'};
+  var b = [];
+  for(var i = 0; i < c.length; i++){ var v = ALPH.indexOf(c[i]); if(v < 0) return {err:'That code has a letter that never appears in codes (' + c[i] + ').'}; pushBits(b, v, 5); }
+  var ks = prng(hash(SALT + '#' + nm));
+  for(i = 0; i < b.length; i++) b[i] ^= (ks() < 0.5 ? 1 : 0);
+  var body = b.slice(0, BODY_BITS);
+  if(readBits(b, BODY_BITS, 26) !== hash(SALT + '|' + nm + '|' + body.join('')) % 67108864 || readBits(b, 0, 3) !== 1)
+    return {err:'This code does not match that name. Check the spelling of the name, or the code was typed wrong.'};
+  var out = {attempt:readBits(b, 3, 4), minutes:readBits(b, 7, 8), rec:[]}, pos = 16;
+  for(i = 0; i < P.length; i++){
+    out.rec.push({w:readBits(b, pos, 4), h:readBits(b, pos + 4, 2), solved:!!readBits(b, pos + 6, 1), sc:readBits(b, pos + 7, 2),
+                  sw:readBits(b, pos + 9, 4), sok:!!readBits(b, pos + 13, 1), sh:readBits(b, pos + 14, 2)});
+    pos += 16;
+  }
+  return out;
+}
+
+function outcome(r){
+  if(r.solved && r.h < HELP_LIMIT) return 'own';
+  if(r.sok) return 'rec';
+  return 'need';
+}
+var OUT_LABEL = {own:'On own', rec:'After help, then passed a similar problem', need:'Still needs work'};
+var HELP_LABEL = ['None', 'Hint', 'More help', 'Full solution'];
+function summarize(rs){
+  var s = {own:0, rec:0, need:0, wrong:0, helped:0, needList:[]};
+  rs.forEach(function(r, i){ var o = outcome(r); s[o]++; if(o === 'need') s.needList.push(i + 1); s.wrong += r.w + r.sw; if(r.h || r.sh) s.helped++; });
+  return s;
+}
+
+function armButton(btn, idleText, armedText, action){
+  if(btn.dataset.armed === '1'){ btn.dataset.armed = '0'; btn.classList.remove('armed'); btn.textContent = idleText; action(); return; }
+  btn.dataset.armed = '1'; btn.classList.add('armed'); btn.textContent = armedText;
+  setTimeout(function(){ if(btn.dataset.armed === '1'){ btn.dataset.armed = '0'; btn.classList.remove('armed'); btn.textContent = idleText; } }, 4000);
+}
+
+/* ---------- teacher view ---------- */
+function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
+function table(heads, rows){
+  var wrap = el('div', 'tablewrap'), t = el('table', 'rt'), tr = el('tr'), tb = el('tbody'), th = el('thead');
+  heads.forEach(function(h){ tr.appendChild(el('th', null, h)); }); th.appendChild(tr); t.appendChild(th);
+  rows.forEach(function(r){ var row = el('tr'); r.forEach(function(c){ var td = el('td'); if(c && c.nodeType) td.appendChild(c); else td.textContent = String(c); row.appendChild(td); }); tb.appendChild(row); });
+  t.appendChild(tb); wrap.appendChild(t); return wrap;
+}
+function pill(o){ return el('span', 'pill ' + o, OUT_LABEL[o]); }
+function detailTable(d){
+  return table(['Problem', 'Result', 'Wrong tries', 'Help used', 'Similar problems'], d.rec.map(function(r, i){
+    var res = r.solved ? (r.h >= HELP_LIMIT ? 'Correct, with a lot of help' : (r.w ? 'Correct after ' + r.w + ' wrong ' + (r.w === 1 ? 'try' : 'tries') : 'Correct on first try')) : 'Viewed the full solution';
+    var sim = r.sc ? r.sc + ' tried · ' + r.sw + ' wrong · help: ' + HELP_LABEL[r.sh] + ' · ' + (r.sok ? 'passed one on own' : 'did not pass one on own') : '—';
+    var cell = el('div', 'stack'); cell.style.gap = '4px'; cell.appendChild(pill(outcome(r))); cell.appendChild(el('span', 'small muted', res));
+    return ['#' + (i + 1), cell, r.w, HELP_LABEL[r.h], sim];
+  }));
+}
+function studentReport(name, d){
+  var box = el('div', 'report'), s = summarize(d.rec);
+  box.appendChild(el('h3', null, name));
+  var stats = el('div', 'stats');
+  [[s.own + ' / 13', 'solved on own'], [s.rec, 'passed a similar problem after help'], [s.need, 'still need work' + (s.needList.length ? ' (#' + s.needList.join(', #') + ')' : '')],
+   [s.wrong, 'wrong tries in all'], [d.minutes + (d.minutes >= 255 ? '+' : '') + ' min', 'time spent'], [d.attempt + (d.attempt >= 15 ? '+' : ''), 'attempt number on that device']].forEach(function(x){
+    var c = el('div', 'stat'); c.appendChild(el('b', null, x[0])); c.appendChild(el('span', null, x[1])); stats.appendChild(c);
+  });
+  box.appendChild(stats); box.appendChild(detailTable(d));
+  return box;
+}
+$('tCheck').onclick = function(){
+  var out = $('tOut'); out.textContent = '';
+  var name = $('tName').value.trim(), d = readCode(name, $('tCode').value);
+  if(d.err){ out.appendChild(el('p', 'msg warn', d.err)); return; }
+  out.appendChild(studentReport(name, d));
+};
+$('tBatchBtn').onclick = function(){
+  var out = $('tOut'); out.textContent = '';
+  var lines = $('tBatch').value.split(/\r?\n/).map(function(l){ return l.trim(); }).filter(Boolean), rows = [], good = [];
+  lines.forEach(function(line){
+    var m = /([0-9A-Za-z]{5}(?:[-\s][0-9A-Za-z]{5}){9}|[0-9A-Za-z]{50})/.exec(line);
+    var name = m ? line.replace(m[0], '').replace(/^[\s,;\t]+|[\s,;\t]+$/g, '').replace(/^name:\s*/i, '').replace(/(?:3-1 practice|haunted house) code:\s*$/i, '').trim() : line;
+    var d = m ? readCode(name, m[0]) : {err:'No code found on this line.'};
+    if(d.err){ rows.push([name || '(no name)', el('span', 'pill invalid', 'Code problem'), d.err, '', '', '']); return; }
+    var s = summarize(d.rec);
+    rows.push([name, el('span', 'pill own', s.own + ' / 13 on own'), s.rec, s.needList.length ? '#' + s.needList.join(', #') : 'None', s.wrong, d.minutes + ' min']);
+    good.push([name, d]);
+  });
+  if(!rows.length){ out.appendChild(el('p', 'msg warn', 'Paste at least one line with a name and a code.')); return; }
+  out.appendChild(el('h3', null, 'Class summary · ' + rows.length + ' student' + (rows.length === 1 ? '' : 's')));
+  out.appendChild(table(['Name', 'Solved on own', 'Passed after help', 'Still needs work', 'Wrong tries', 'Time'], rows));
+  good.forEach(function(g){
+    var det = el('details'), sum = el('summary', null, 'Details for ' + g[0]);
+    det.appendChild(sum); det.appendChild(studentReport(g[0], g[1])); out.appendChild(det);
+  });
+};
+
+/* ---------- inside a room ---------- */
+function renderPiece(){
+  var box = $('pieceGet'), st = S.cl[S.i];
+  if(!st){ box.hidden = true; box.innerHTML = ''; return; }
+  var c = CELLS[S.i];
+  box.hidden = false; box.className = 'pieceget st' + st;
+  box.innerHTML = '<svg class="pieceicon" viewBox="' + c.x + ' ' + c.y + ' ' + c.w + ' ' + c.h + '" aria-hidden="true"><use href="#scene"/></svg><div><b>Puzzle piece collected!</b><span>' +
+    (st === 1 ? 'You earned this one on your own.' : 'You earned this piece with extra help. Your teacher will see that.') + '</span></div>';
+}
+function renderItem(){
+  var q = curQ(), r = rec(), rm = ROOMS[S.i];
+  $('rmEyebrow').textContent = 'Door ' + (S.i + 1);
+  $('rmName').textContent = rm.name;
+  $('rmLine').textContent = rm.line;
+  $('rmChip').textContent = '🧩 ' + cleared() + ' / ' + P.length;
+  $('qNum').textContent = S.sim ? 'Similar to #' + q.n : 'Problem ' + q.n;
+  var tag = $('qTag');
+  if(S.sim){ tag.hidden = false; tag.textContent = 'Ghost challenge ' + r.sc + ' of up to ' + MAX_SIMILAR; } else tag.hidden = true;
+  $('qDir').textContent = (q.kind === 'two' && q.variant) ? 'Determine if the ordered pairs ' + pairText(q.pts[0]) + ' and ' + pairText(q.pts[1]) + ' are solutions to the system of linear equations. Show work to justify your answer.' : DIRECTIONS[q.kind];
+  $('qBody').innerHTML = bodyHtml(q);
+  if(q.kind === 'graph') bindGraph();
+  renderHelp();
+  renderControls();
+  renderPiece();
+}
+function renderControls(){
+  var done = S.phase === 'done';
+  $('checkBtn').disabled = done;
+  $('helpBtn').disabled = done || S.h >= 3;
+  $('helpBtn').textContent = ['Help', 'More help', 'Show full solution', 'Full solution shown'][S.h];
+  $('helpWarn').hidden = !(S.h === 1 && !done);
+  var nb = $('nextBtn');
+  if(done){
+    nb.hidden = false;
+    if(S.cl[S.i]) nb.textContent = allCleared() ? 'Finish the picture →' : 'Back to the hallway →';
+    else nb.textContent = S.sim ? 'Try another similar problem →' : 'Try a similar problem →';
+  } else nb.hidden = true;
+  var m = $('qMsg');
+  m.textContent = S.msg ? S.msg.text : ''; m.className = 'msg' + (S.msg && S.msg.cls ? ' ' + S.msg.cls : '');
+  if(done) $('qBody').querySelectorAll('input,select,button').forEach(function(el){ el.disabled = true; });
+}
+/* the door hands over its piece once the student is allowed to move on */
+function settle(){
+  if(S.phase !== 'done' || S.cl[S.i] || nextStep() !== 'next') return;
+  S.cl[S.i] = outcome(rec()) === 'own' ? 1 : 2;
+  S.got = S.i;
+  $('rmChip').textContent = '🧩 ' + cleared() + ' / ' + P.length;
+  sfx.piece();
+}
+$('helpBtn').onclick = function(){
+  if(S.phase !== 'ask' || S.h >= 3) return;
+  var r = rec();
+  S.h++;
+  if(S.sim) r.sh = Math.max(r.sh, S.h); else r.h = Math.max(r.h, S.h);
+  if(S.h >= 3){
+    S.phase = 'done';
+    var step = nextStep();
+    say(step === 'similar' ? 'Read through the solution, then try a similar problem on your own to earn the piece.' : 'Read through the solution. The ghosts will let you move on, and your teacher will see that this one needed extra help.', 'info');
+    settle();
+  } else say('', '');
+  persist(); renderHelp(); renderControls(); renderPiece();
+  $('helpBox').scrollIntoView({block:'nearest', behavior:'smooth'});
+};
+$('checkBtn').onclick = function(){
+  if(S.phase !== 'ask') return;
+  var q = curQ(), r = rec(), res = evaluate(q);
+  if(res.blank){
+    say(q.kind === 'graph' ? 'Finish the boxes outlined with dashes first. The graph needs 2 points for each line.' : 'Fill in the boxes outlined with dashes first.', 'info');
+    renderControls(); return;
+  }
+  if(res.ok){
+    S.phase = 'done';
+    sfx.ok();
+    if(!S.sim){
+      r.solved = true;
+      say(r.h >= HELP_LIMIT ? 'Correct! You used a lot of help on this one, so the ghosts want a similar problem answered on your own before the door gives up its piece.' : (r.w ? 'Correct! Nice job fixing your work.' : 'Correct on the first try!'), 'good');
+    } else if(S.h < HELP_LIMIT){
+      r.sok = true; say('Correct! You solved the similar problem on your own.', 'good');
+    } else {
+      say(r.sc < MAX_SIMILAR ? 'Correct, but with a lot of help. Try one more similar problem.' : 'Correct. Time to move on. Your teacher will see that this one needed extra help.', 'good');
+    }
+    if(q.kind === 'graph') drawBoard($('gcanvas'), q, {pts:pts, answer:false});
+    settle();
+  } else {
+    var tries;
+    sfx.bad();
+    if(S.sim){ r.sw++; } else { r.w++; }
+    tries = (S.sim ? null : r.w);
+    say('Not quite. Look again at the boxes outlined in red.' + ((tries === null || tries >= 2) && S.h < 3 ? ' Press Help if you are stuck.' : ''), 'warn');
+  }
+  persist(); renderControls(); renderPiece();
+  if(S.cl[S.i] && S.got === S.i) $('pieceGet').scrollIntoView({block:'nearest', behavior:'smooth'});
+};
+$('qBody').addEventListener('input', function(e){ if(e.target.classList) e.target.classList.remove('ok','bad','missing'); });
+$('qBody').addEventListener('change', function(e){ if(e.target.classList) e.target.classList.remove('ok','bad','missing'); });
+$('qBody').addEventListener('keydown', function(e){ if(e.key === 'Enter' && e.target.tagName === 'INPUT') $('checkBtn').click(); });
+
+function leaveRoom(){
+  var all = allCleared();
+  transition(function(){
+    S.i = null; S.sim = null; S.h = 0; S.phase = 'ask'; S.msg = null; pts = [];
+    if(all){
+      S.finishedAt = Date.now(); S.phase = 'finished'; persist();
+      renderDone(); show('vDone'); sfx.win();
+    } else { persist(); show('vHouse'); }
+    window.scrollTo(0, 0);
+  });
+}
+$('nextBtn').onclick = function(){
+  if(S.phase !== 'done') return;
+  if(S.cl[S.i]){ leaveRoom(); return; }
+  var r = rec(), seed, v = null;
+  r.sc++;
+  for(var t = 0; t < 10 && !v; t++){ seed = Math.floor(Math.random()*1e9) + 1; v = variantFor(S.i + 1, seed); }
+  S.sim = seed;
+  S.h = 0; S.phase = 'ask'; S.msg = null; pts = [];
+  persist(); renderItem(); $('qSheet').scrollIntoView({block:'start', behavior:'smooth'});
+};
+window.addEventListener('resize', function(){
+  if($('vRoom').hidden || !S || S.i === null) return;
+  redrawInput();
+  if(S.h >= 3 && curQ().lines) drawBoard($('hcanvas'), curQ(), {answer:true});
+});
+
+/* ---------- finished ---------- */
+function renderDone(){
+  var s = summarize(S.rec);
+  $('doneTitle').textContent = 'The house is saved, ' + S.name.split(' ')[0] + '!';
+  $('doneDate').textContent = 'All ' + P.length + ' puzzle pieces found · ' + new Date(S.finishedAt).toLocaleString();
+  $('doneBoard').innerHTML = puzzleSvg();
+  var stats = $('doneStats'); stats.innerHTML = '';
+  [[s.own + ' / ' + P.length, 'solved on your own'], [s.rec, 'solved after help and a similar problem'], [s.wrong, 'wrong tries in all'], [s.helped, 'problems where you used help']].forEach(function(x){
+    var d = document.createElement('div'); d.className = 'stat'; d.innerHTML = '<b>' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span>'; stats.appendChild(d);
+  });
+  $('codeFor').textContent = 'Turn in this code together with your name, spelled exactly as: ' + S.name;
+  $('codeOut').textContent = makeCode(S);
+  $('copyMsg').textContent = ''; $('copyFallback').hidden = true;
+}
+$('copyBtn').onclick = function(){
+  var text = 'Name: ' + S.name + '\nHaunted House code: ' + $('codeOut').textContent;
+  function fallback(){ var ta = $('copyFallback'); ta.hidden = false; ta.value = text; ta.focus(); ta.select(); $('copyMsg').textContent = 'Select the text below and copy it.'; }
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function(){ $('copyMsg').textContent = 'Copied your name and code.'; }, fallback);
+    else fallback();
+  }catch(e){ fallback(); }
+};
+$('restartBtn').onclick = function(){
+  armButton($('restartBtn'), 'Restart the haunt', 'Click again to erase your work', function(){
+    var name = S ? S.name : '';
+    S = null; pts = [];
+    try{ localStorage.removeItem(STORE); }catch(e){}
+    $('nameIn').value = name; $('startMsg').textContent = '';
+    show('vStart'); window.scrollTo(0, 0);
+  });
+};
+$('tBack').onclick = function(){ if(location.hash) location.hash = ''; route(); };
+window.addEventListener('hashchange', route);
+
+/* ---------- boot ---------- */
+buildClips();
+buildHouse();
+paintAudioBtns();
+var saved = load(STORE);
+if(saved && saved.name && Array.isArray(saved.rec) && saved.rec.length === P.length && Array.isArray(saved.cl) && saved.cl.length === P.length){ S = saved; if(typeof S.i !== 'number') S.i = null; }
+if(S && S.i !== null && S.sim && !variantFor(S.i + 1, S.sim)) S.sim = null;
+route();
+})();
+
+</script>
+</body></html>
